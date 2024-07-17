@@ -24,26 +24,31 @@ Installation
 
 1. ``pip install django-silent-mammoth-whistle``
 
-2. Add silent mammoth whistle to ``INSTALLED_APPS`` setting::
+2. Add to ``INSTALLED_APPS`` setting - ideally just above the main app::
 
-	  INSTALLED_APPS = [
-        ...,
-        "silent_mammoth_whistle",
-		    ...,
-    ]
+.. code-block:: python
+		INSTALLED_APPS = [
+			...,
+			"silent_mammoth_whistle",
+			...,
+		]
 
-	Ideally just above the main app. This is because silent mammoth whistle will intercept async JavaScript requests (if you use them) to log client side events (e.g. opening a dialog box). When it does this, it prevents the request from making it to ``views.py`` of the main app and being accidently interpreted by a view.
-
-3. Add silent mammoth whistle middleware. At the end is fine::
 	
-    MIDDLEWARE = [
-		    ...,
-		    'silent_mammoth_whistle.middleware.SilentMammothWhistleMiddleware',
-    ]
+
+3. Add middleware. At the end is fine::
+	
+		MIDDLEWARE = [
+			...,
+			'silent_mammoth_whistle.middleware.SilentMammothWhistleMiddleware',
+		]
 	
 4. Include the silent mammoth whistle URLconf in your project urls.py. The URL (e.g. ``/mammoth``) can be anything you like::
 	
-    'path('/mammoth', include('silent_mammoth_whistle.urls')),'
+		urlpatterns = [
+			...,
+			path('/mammoth', include('silent_mammoth_whistle.urls')),
+			...,
+		]
 	
 5. Add ``<script src="{% static 'silent_mammoth_whistle/js/whistle.js' %}"></script>`` to your templates
 
@@ -61,7 +66,7 @@ settings.py
 
 	Defaults to ``'id'``
 
-	The name (as a string) of a ``User`` model attribute that is used as the user identified. It appears in the UI and it used for determining which web requests belong to which users. It should be a unique value.
+	The name of a ``User`` model attribute that is used as the unqiue user identifier. It is displayed in the UI and is used for determining which web requests belong to which users.
 
 
 ``WHISTLE_AUTO_LOG_REQUESTS``
@@ -75,45 +80,45 @@ settings.py
 
 	Defaults to ``'/whistle'``
 
-	The url used by ``whistle.js`` to make web requests using JavaScript.
+	The url used by the ``whistle`` function in ``whistle.js`` to make web requests using JavaScript.
 
 
 ``WHISTLE_COOKIES``
 
 	Defaults to ``True``
 
-	When True, a cookie is added to clients and is used with some JavaScript to record viewport dimensions. I don't think this constitutes a "tracking cookie", but if you think it does, and you don't want that, just set this to ``False``
+	When True, a cookie is added to clients and is used with some JavaScript to record viewport dimensions. I don't think this constitutes a "tracking cookie", but if you think it does, and you don't want that, just set this to ``False``.
 
 
 Usage
 =====
 
-By default, silent mammoth whistle will record all web requests (with a HTTP method and the URL for each request).
+By default, silent mammoth whistle will record all web requests (specifically the HTTP method and the URL for each).
 
-You can also record additional data for a request. 
+You can also record additional data for a request.
 
-    .. code-block:: Python
+.. code-block:: python
 
-    request.whistle.request('put a string here')
+	request.whistle.request('put a string here')
 
-Silent mammoth whistle is super-simple and the data for requests needs to be in a string format. You can record as much data as you like, and you can make as many of these ``request.whistle.request()`` calls as you like. Silent mammoth whistle will merge the strings from all the calls into a single string, separated by a tab.
+Silent mammoth whistle is super-simple and the data for requests needs to be in a string format. You can record as much data as you like, and you can make as many of these ``request.whistle.request()`` calls as you like. Silent mammoth whistle will merge the strings from all the calls into a single string, separated by a tab when rendered.
 
-Practical example! This line will record the fields present in a POST request. This could be useful if your form has many optional fields and you want to know which ones were included.
+Practical example time! This line will record the fields present in a POST request. This could be useful if your form has many optional fields and you want to know which ones were included by the user.
 
-    .. code-block:: Python
+.. code-block:: python
 
-    request.whistle.request('fields=' + ", ".join(request.POST.dict().keys()))
+	request.whistle.request('fields=' + ", ".join(request.POST.dict().keys()))
 
-The session details in silent mammoth whistle has 3 columns: time, request, and response. Request is the obvious column to use, but you might like to separate tracking of what the user requested from how the server responded. E.g.
+When viewing session details in silent mammoth whistle, you'll see 3 columns: time, request, and response. Request is the obvious column to use, but you might like to separate tracking of what the user requested from how the server responded. E.g.
 
-    .. code-block:: Python
+.. code-block:: python
 
-    request.whistle.response('fields in error=' + ", ".join(form.errors.dict().keys()))
+	request.whistle.response('fields in error=' + ", ".join(form.errors.dict().keys()))
 
 These calls all start with ``request.`` because silent mammoth whistle adds a ``whistle`` object to the standard Django ``request`` object.
 
 The JavaScript API is similar
 
-    .. code-block:: JavaScript
+.. code-block:: javascript
 
-    whistle('Edit dialog box open')
+	whistle('Edit dialog box open')
