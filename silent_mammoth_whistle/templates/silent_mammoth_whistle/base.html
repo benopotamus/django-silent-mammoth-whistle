@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<title>{% block title %}{% endblock %}</title>
+	<link rel="stylesheet" href="{% static 'silent_mammoth_whistle/css/base.css' %}?v=1">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/themes/light.css" />
+	<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.15.0/cdn/shoelace-autoloader.js"></script>
+
+	<script src="{% static 'silent_mammoth_whistle/js/htmx.min.js' %}?v=2.0"></script>
+	<script src="{% static 'silent_mammoth_whistle/js/whistle.js' %}"></script>
+
+	<style>{% block extra_styles %}{% endblock %}</style>
+</head>
+<body>
+	<section id="body">
+		{% block content %}{% endblock %}
+	</section>
+</body>
+</html>

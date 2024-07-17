@@ -1,0 +1,32 @@
+{% load static whistle_helpers %}
+
+<div id='sessions-table-container' class="container-padding">
+	<h2 class="little-title">{% if is_authenticated %}Logged in{% else %}Unauthenticated{% endif %}</h2>
+	<table class="primary{% if is_authenticated %} authed{% else %} unauthed{% endif %}">
+		<thead>
+			<tr>
+				<td class='main-cell'>User</td>
+				<td class='number-cell'>Whistles</td>
+				<td class='number-cell'>Duration</td>
+				<td class='small-cell nowrap'></td>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in whistles_per_user %}
+				<tr>
+					<td class='main-cell'>{{ row.user_id }}</td>
+					<td class='number-cell'>{{ row.num_whistles }}</td>
+					<td class='number-cell nowrap'>
+						<div>{% time_duration row.min_time row.max_time %}</div>
+						<div class='support-data'>{{ row.min_time|date:"H:i" }} to {{ row.max_time|date:"H:i" }}</div>
+					</td>
+					<td class='small-cell actions'>
+						<a href="{% url 'silent_mammoth_whistle:session' row.user_id date %}" class="button">
+							{% include "silent_mammoth_whistle/_icon_next.svg" %}
+						</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>

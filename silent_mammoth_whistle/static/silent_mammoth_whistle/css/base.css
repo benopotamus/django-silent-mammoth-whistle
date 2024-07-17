@@ -1,0 +1,365 @@
+:root {
+	--teal-100: #effcf6;
+	--teal-200: #C6F7E2;
+	--teal-300: #8EEDC7;
+	--teal-500: #3ebd93;
+	--teal-600: #199473;
+
+	--purple-100: #EAE2F8;
+	--purple-200: #CFBCF2;
+	--purple-400: #8662C7;
+	--purple-500: #724BB7;
+	--purple-600: #653CAD;
+
+	--blue-gray-100: #f0f4f8;
+	--blue-gray-200: #D9E2EC;
+	--blue-gray-300: #bcccdc;
+	--blue-gray-400: #9fb3c8;
+	--blue-gray-500: #829AB1;
+	--blue-gray-600: #627d98;
+	--blue-gray-700: #486581;
+	--blue-gray-1000: #102a43;
+
+	--yellow-300: #f8e3a3;
+	
+}
+
+body {
+	color: var(--blue-gray-1000);
+	font-family: var(--sl-font-sans);
+	background-color: var(--blue-gray-100);
+}
+#body {
+	margin: var(--sl-spacing-medium);
+	padding: var(--sl-spacing-x-large);
+}
+#title-bar {
+	display: flex;
+	align-items: center;
+}
+
+.container {
+	background-color: white;
+	border-radius: 8px;
+	border: 1px solid var(--blue-gray-200);
+	margin-top: var(--sl-spacing-small);
+}
+.container-padding {
+	padding: var(--sl-spacing-large);
+}
+
+h1, h2 {
+	margin: 0;
+	font-weight: normal;
+}
+.heading.title {
+	font-size: var(--sl-font-size-large);
+	font-weight: bold;
+}
+.little-title {
+	text-transform: uppercase;
+	font-size: var(--sl-font-size-small);
+	color: var(--blue-gray-700);
+	margin-bottom: var(--sl-spacing-medium);
+}
+.date-selection-heading .little-title {
+	margin-bottom: 0px;
+}
+
+.date-selection-heading {
+	display: flex;
+	justify-content: space-between;
+	align-items: end;
+}
+
+#monthly-stats {
+	width: 740px;
+}
+
+#no-whistles-message {
+	text-align: center;
+	color: var(--blue-gray-600);
+	padding: var(--sl-spacing-3x-large);
+	font-style: italic;
+}
+#no-new-users-message {
+	font-size: var(--sl-font-size-small);
+}
+#chart-and-tops {
+	display: flex;
+	flex-direction: column;
+	background-color: white;
+}
+#chart-container {
+	padding: var(--sl-spacing-large);
+	padding-bottom: var(--sl-spacing-small);
+}
+#top-tables-container {
+	display: flex;	
+	gap: var(--sl-spacing-3x-large);
+}
+.monthly-stats-section {
+	padding: var(--sl-spacing-large);
+	border-top: 1px solid var(--blue-gray-200)
+}
+#top-lists {
+	display: flex;
+	flex-direction: row;
+	gap: var(--sl-spacing-medium);
+	margin-top: var(--sl-spacing-medium);
+}
+.support-data {
+	font-size: var(--sl-font-size-small);
+	color: var(--blue-gray-600)
+}
+
+.time-total sl-icon {
+	vertical-align: text-top;
+}
+.time-fromto {
+	font-size: small;
+	color: var(--sl-color-gray-600);
+}
+
+/* Set size of daily stats container so next/previous buttons stay in same place when there are no whistles/sessions.
+Monthly stats is controlled by the chart - which is the widest element */
+#daily-stats {
+	min-width: 660px;
+}
+
+#whistles-per-user-tables {
+	display: flex;
+	flex-direction: column;
+}
+#whistles-per-user-tables #sessions-table-container:nth-child(2) {
+	border-top: 1px solid var(--blue-gray-200);
+}
+#whistles-per-user-tables .main-cell {
+	width: 100%;
+}
+.nowrap {
+	white-space: nowrap;
+}
+#sessions-table-container h2 {
+	margin: 0px 0px var(--sl-spacing-small) 0px;
+	font-weight: normal;
+	font-size: var(--sl-font-size-small);
+  	color: var(--blue-gray-700);
+}
+
+
+table {
+	border-collapse: collapse;
+}
+table tr {
+	font-size: var(--sl-font-size-small);
+}
+table.primary thead tr {
+	text-align: left;
+	color: white;
+}
+table.authed thead tr { background-color: var(--purple-500); }
+table.authed tbody tr:hover { background-color: var(--purple-100); }
+table.unauthed thead tr { background-color: var(--blue-gray-500); }
+table.unauthed tbody tr:hover { background-color: var(--blue-gray-100); }
+
+th,
+td {
+	vertical-align: baseline;
+	padding: var(--sl-spacing-x-small) var(--sl-spacing-medium);
+}
+table.primary tbody tr {
+	border-bottom: 1px solid var(--blue-gray-100);
+}
+table.primary  tbody tr:last-of-type {
+	border-bottom: none;
+}
+#monthly-stats thead tr {
+	border-bottom: 1px solid var(--blue-gray-100);
+}
+#monthly-stats tr td:first-of-type {
+	padding-left: 0px;
+}
+#monthly-stats tr td:last-of-type {
+	padding-right: 0px;
+}
+
+.number-cell {
+	text-align: right;
+}
+.small-cell {
+	width: 1%;
+	white-space: nowrap;
+}
+td.actions {
+	vertical-align: middle;
+}
+
+
+/* Session.html */
+#whistles-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: end;
+	margin-bottom: var(--sl-spacing-medium);
+}
+#session-time {
+	text-align: right;
+}
+#user-header {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+#user-header .secondary {
+	font-size: var(--sl-font-size-small);
+	color: var(--blue-gray-700);
+	display: flex;
+	align-items: center;
+}
+#whistles-header h1,
+#session-time .duration {
+	display: flex;
+	align-items: center;
+	gap: var(--sl-spacing-2x-small);
+}
+#session-time .duration {
+	font-size: var(--sl-font-size-small);
+}
+.chart-subheading {
+	margin-bottom: var(--sl-spacing-large);
+  	font-size: var(--sl-font-size-x-small);
+	color: var(--blue-gray-700);
+}
+
+.browser-change {
+	font-size: var(--sl-font-size-x-small);
+	width: fit-content;
+	padding: var(--sl-spacing-x-small) var(--sl-spacing-small);
+	display: flex;
+  	gap: var(--sl-spacing-medium);
+}
+.browser-change > .data {
+	display: flex;
+	align-items: center;
+	gap: var(--sl-spacing-2x-small);
+}
+table .browser-change {
+	color: var(--blue-gray-600);
+}
+
+.client-event td:nth-of-type(2) {
+	padding-left: 30px;
+  	font-style: italic;
+}
+
+
+/* CSS-only elements */
+.button-group {
+	display: flex;
+	gap: var(--sl-spacing-2x-small);
+}
+/* .button {
+	background-color: #FFFFFF;
+	box-sizing: border-box;
+	font-family: "Inter var",ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+	font-size: .875rem;
+	font-weight: 600;
+	line-height: 1.25rem;
+	text-align: center;
+	text-decoration: none #D1D5DB solid;
+	text-decoration-thickness: auto;
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+	cursor: pointer;
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: manipulation;
+
+	display: flex;
+	width: fit-content;
+	/* border-radius: .5rem; */
+	/* padding: .75rem 1rem; */
+	/* border-radius: 80px;
+	padding: .75rem;
+	color: var(--blue-gray-700);
+	border: 1px solid var(--blue-gray-200);
+}
+.button:hover {
+	background-color: var(--blue-gray-200);
+	border-color: var(--blue-gray-300);
+	color: var(--blue-gray-800);
+}
+.button:focus {
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+}
+.button:focus-visible {
+	box-shadow: none;
+} */
+
+
+
+/* CSS */
+.button {
+  appearance: none;
+  background-color: #FAFBFC;
+  border: 1px solid rgba(27, 31, 35, 0.15);
+  border-radius: 6px;
+  box-shadow: rgba(27, 31, 35, 0.04) 0 1px 0, rgba(255, 255, 255, 0.25) 0 1px 0 inset;
+  box-sizing: border-box;
+  color: #24292E;
+  cursor: pointer;
+  display: inline-block;
+  font-family: -apple-system, system-ui, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  list-style: none;
+  padding: 6px 16px;
+  position: relative;
+  transition: background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: middle;
+  white-space: nowrap;
+  word-wrap: break-word;
+
+  display: flex;
+  width: fit-content;
+  border-radius: 80px;
+  /* padding: .75rem; */
+  padding: var(--sl-spacing-x-small);
+  color: var(--blue-gray-700);
+}
+
+.button:hover {
+  background-color: #F3F4F6;
+  text-decoration: none;
+  transition-duration: 0.1s;
+}
+
+.button:disabled {
+  background-color: #FAFBFC;
+  border-color: rgba(27, 31, 35, 0.15);
+  color: #959DA5;
+  cursor: default;
+}
+
+.button:active {
+  background-color: #EDEFF2;
+  box-shadow: rgba(225, 228, 232, 0.2) 0 1px 0 inset;
+  transition: none 0s;
+}
+
+.button:focus {
+  outline: 1px transparent;
+}
+
+.button:before {
+  display: none;
+}
+
+.button:-webkit-details-marker {
+  display: none;
+}

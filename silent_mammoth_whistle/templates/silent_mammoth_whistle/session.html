@@ -1,0 +1,92 @@
+{% extends 'silent_mammoth_whistle/base.html' %}
+{% load whistle_helpers %}
+
+{% block title %}{{ user_id}} on {{ date_str }}{% endblock %}
+
+{% block extra_styles %}
+	h1 {
+		margin: 0
+	}
+	.timestamp {
+		display:none;
+	}
+{% endblock %}
+
+{% block content %}
+
+	<div id="whistles-header">
+		<a href="{% url 'silent_mammoth_whistle:index_by_date' date %}" class="button">
+			{% include "silent_mammoth_whistle/_icon_previous.svg" %}
+		</a>
+		<div id="user-header">
+			<h1 class='heading large'><sl-icon name="person"></sl-icon> {{ user_id }}</h1>
+			<div>{{ date_str }}</div>
+			<div class='secondary'>
+				<div class="browser-change">
+					{% if useragent %}<div class="data"><sl-icon name="globe"></sl-icon> {{ useragent|ua_parse }}</div>{% endif %}
+					{% if viewport_dimensions %}
+						<div class="data">
+							<sl-icon name="display"></sl-icon>
+							{{ viewport_dimensions }}
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		<div id="session-time">
+			<div class="duration"><sl-icon name="stopwatch"></sl-icon> {% time_duration min_time max_time %}</div>
+			<div class="time-fromto">{{ min_time|date:"H:i" }} to {{ max_time|date:"H:i" }}</div>
+		</div>
+	</div>
+
+	<div class='container container-padding'>
+		<table class="primary{% if is_authenticated %} authed{% else %} unauthed{% endif %}">
+			<thead>
+				<tr>
+					<td class='number-cell' style="white-space: nowrap;">Time delta</td>
+					<td>Request</td>
+					<td>Response</td>
+				</tr>
+			</thead>
+			<tbody>
+				{% for whistle in whistles %}
+					{% comment %} https://stackoverflow.com/questions/32795907/how-to-access-the-next-and-the-previous-elements-in-a-django-template-forloop {% endcomment %}
+
+					{% with previous_whistle=whistles|forloop_previous:forloop.counter0 %}
+						{% if not forloop.first %}
+							{% if whistle|browser_change:previous_whistle %}
+								<tr>
+									<td colspan=3>
+										<div class="browser-change">
+											<em>Browser change:</em>
+											{% if whistle.useragent %}<div class="data"><sl-icon name="globe"></sl-icon> {{ whistle.useragent|ua_parse  }}</div>{% endif %}
+											{% if whistle.viewport_dimensions %}<div class="data"><sl-icon name="arrows-fullscreen"></sl-icon> {{ whistle.viewport_dimensions }}</div>{% endif %}
+										</div>
+									</td>
+								</tr>
+							{% endif %}
+						{% endif %}
+
+						<tr{% if whistle.is_client_event %} class="client-event"{% endif %}>
+							<td class='number-cell small-cell'>
+								{% if forloop.first %}
+									START
+								{% else %}
+									{% time_duration_condensed previous_whistle.datetime whistle.datetime %}
+								{% endif %}
+								<span class="timestamp">: {{ whistle.datetime|date:'r' }}</span>
+							</td>
+							<td>{{ whistle.request|html_tabs|small_guids }}</td>
+							<td>{{ whistle.response|html_tabs|small_guids }}</td>
+						</tr>
+					{% endwith %}
+				{% endfor %}
+				<tr>
+					<td class='number-cell small-cell'>END</td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+{% endblock %}

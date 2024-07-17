@@ -1,0 +1,153 @@
+{% extends 'silent_mammoth_whistle/base.html' %}
+{% load static whistle_helpers %}
+
+{% block title %}Activity overview{% endblock %}
+
+{% block extra_styles %}
+	#body {
+		max-width: fit-content;
+		margin: 0 auto;
+		display: flex;
+		gap: var(--sl-spacing-x-large);
+		flex-wrap: wrap;
+	}
+{% endblock %}
+
+{% block content %}
+	{% comment %} Next and previous buttons for changing daily sessions uses hx-boost. We use hx-preserve here to stop the monthly data (mostly the chart) being recreated. {% endcomment %}
+	<div id="monthly-stats" hx-preserve="true">
+		<div class="date-selection-heading">
+			<div>
+				<h1 class='heading title'>{{ chart_period }}</h1>
+				<div class="little-title">Monthly stats</div>
+			</div>
+			<div class="button-group">
+				<a href="{% url 'silent_mammoth_whistle:index_by_date' previous_month %}" class="button">
+					{% include "silent_mammoth_whistle/_icon_previous.svg" %}
+				</a>
+				<a href="{% url 'silent_mammoth_whistle:index_by_date' next_month %}" class="button">
+					{% include "silent_mammoth_whistle/_icon_next.svg" %}
+				</a>
+			</div>
+		</div>
+
+		{% comment %} This if statement hides daily stats as well as they're not relevant if the month doesn't even show {% endcomment %}
+		{% if not month_has_whistles %}
+			<div id="no-whistles-message" class='container'>No whistles for this month</div>
+		{% else %}
+			<div id="chart-and-tops" class='container'>
+				<div id="chart-container">
+					<div class="little-title">Sessions per day</div>
+					<div style="height:250px"><canvas id="whistles-chart"></canvas></div>
+					<script src="{% static 'silent_mammoth_whistle\js\chart.min.js' %}"></script>
+					{% include "silent_mammoth_whistle/_chart_javascript.html" %}
+				</div>
+				{% if top_useragents or top_viewport_dimensions %}
+					<div id="top-tables-container" class='monthly-stats-section'>
+						{% if top_useragents %}
+							<div class='table-container'>
+								<div class="little-title">Top platforms</div>
+								<table>
+									<thead>
+										<tr>
+											<td>Platform</td>
+											<td class='number-cell'>% of sessions</td>
+										</tr>
+									</thead>
+									<tbody>
+										{% for item in top_useragents %}
+											<tr>
+												<td>{{ item.useragent|ua_parse }}</td>
+												<td class='number-cell'>{% percentage item.sessions total_useragents %}&nbsp;&nbsp;<span class='support-data'>{{ item.sessions }}</span></td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						{% endif %}
+						{% if top_viewport_dimensions %}
+							<div class='table-container'>
+								<div class="little-title">Top screen sizes</div>
+								<table>
+									<thead>
+										<tr>
+											<td>Dimensions</td>
+											<td class='number-cell'>% of sessions</td>
+										</tr>
+									</thead>
+									<tbody>
+										{% for item in top_viewport_dimensions %}
+											<tr>
+												<td>{{ item.viewport_dimensions }}</td>
+												<td class='number-cell'>{% percentage item.sessions total_viewport_dimensions %}&nbsp;&nbsp;<span class='support-data'>{{ item.sessions }}</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						{% endif %}
+					</div>
+				{% endif %}
+				<div id="new-users" class='monthly-stats-section'>
+					<div class='table-container'>
+						<div class="little-title">New users</div>
+						{% if not new_users %}
+							<div id="no-new-users-message">No new users this month</div>
+						{% else %}
+							<table>
+								<thead>
+									<tr>
+										<td>User</td>
+										<td>Date joined</td>
+									</tr>
+								</thead>
+								<tbody>
+									{% for user in new_users %}
+										<tr>
+											<td>{{ user|preferred_user_id }}</td>
+											<td>{{ user.date_joined|date:"j F" }}</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	</div>
+
+	{% block daily_stats %}
+		<div id="daily-stats">
+			{% if month_has_whistles %}
+				<div id="daily-sessions-header" class="date-selection-heading">
+					<div>
+						<h2 class='heading title'>{{ day_str }}</h2>
+						<div class="little-title">Sessions</div>
+					</div>
+					<div hx-boost="true" class="button-group">
+						<a href="{% url 'silent_mammoth_whistle:index_by_date' previous_day %}" class='button'>
+							{% include "silent_mammoth_whistle/_icon_previous.svg" %}
+						</a>
+						<a href="{% url 'silent_mammoth_whistle:index_by_date' next_day %}" class='button'>
+							{% include "silent_mammoth_whistle/_icon_next.svg" %}
+						</a>
+					</div>
+				</div>
+				{% if authed_whistles_per_user|length == 0 and unauthed_whistles_per_user|length == 0 %}
+					<div id="no-whistles-message" class='container'>No whistles</div>
+				{% else %}
+					<div id="whistles-per-user-tables" class='container'>
+						{% if authed_whistles_per_user|length > 0 %}
+							{% include "silent_mammoth_whistle/_whistles_per_user_table.html" with is_authenticated=True whistles_per_user=authed_whistles_per_user %}
+						{% endif %}
+						{% if unauthed_whistles_per_user|length > 0 %}
+							{% include "silent_mammoth_whistle/_whistles_per_user_table.html" with is_authenticated=False whistles_per_user=unauthed_whistles_per_user %}
+						{% endif %}
+					</div>
+				{% endif %}
+			{% endif %}
+		</div>
+	{% endblock %}
+
+{% endblock %}

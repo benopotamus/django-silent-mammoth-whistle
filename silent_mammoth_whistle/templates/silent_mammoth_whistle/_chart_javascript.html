@@ -1,0 +1,98 @@
+<script>
+	const canvas = document.getElementById('whistles-chart')
+	const whistlesChart = new Chart(canvas, {
+		type: 'bar',
+		data: {
+			labels: {{ chart_xaxis_labels }},
+			datasets: [
+				{
+					label: 'Logged in',
+					data: {{ authed_chart_data }},
+					hoverBackgroundColor: '#8662C7', // --purple-400
+					backgroundColor: function(context) {
+						// Change the color of the specific bar you want
+						let index = context.dataIndex;
+						if (index === {{ day }}) { // Change the index to the bar you want to highlight
+							return '#653CAD' // The color for the specific bar (--purple-600)
+						} else {
+							return '#CFBCF2' // Default color for other bars (--purple-200)
+						}
+					},
+				},
+				{
+					label: 'Unauthenticated',
+					data: {{ unauthed_chart_data }},
+					hoverBackgroundColor: '#9fb3c8', // --blue-gray-400
+					backgroundColor: function(context) {
+						// Change the color of the specific bar you want
+						let index = context.dataIndex;
+						if (index === {{ day }}) { // Change the index to the bar you want to highlight
+							return '#627d98' // The color for the specific bar (--blue-gray-600)
+						} else {
+							return '#D9E2EC' // Default color for other bars (--blue-gray-200)
+						}
+					},
+				}
+			]
+		},
+		options: {
+			maintainAspectRatio: false,
+			animation: { duration: 0 },
+			elements: {
+				bar: {
+					borderRadius: 2,
+				},
+				point: {
+					radius: 2,
+				}
+			},
+			plugins: {
+				legend: { 
+					display: true,
+					position: 'bottom',
+					labels: {
+						usePointStyle: true,
+						pointStyle: 'rectRounded',
+						boxHeight: 10,
+						boxWidth: 8,
+					}
+				},
+				tooltip: { enabled: false },
+			},
+			responsive: true, // TODO made it responsive
+			scales: {
+				x: { 
+					grid: { display: false },
+					stacked: true,
+				},
+				y: { grid: { display: false },
+					ticks: { precision: 0 },
+					stacked: true,
+				}
+			},
+			onHover: (event, chartElement) => {
+				event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default'
+			},
+		},
+	})
+	const chartDates = {{ chart_dates|safe }}
+	canvas.onclick = (evt) => {
+		const res = whistlesChart.getElementsAtEventForMode(
+			evt,
+			'nearest',
+			{ intersect: true },
+			true
+		)
+		// If didn't click on a bar, `res` will be an empty array
+		if (res.length === 0) {
+			return
+		}
+		// Alerts "You clicked on A" if you click the "A" chart
+		//alert('You clicked on ' + whistlesChart.data.labels[res[0].index]);
+		//console.log(whistlesChart.data.labels[res[0].index])
+
+		/* -1 is used because we're using chart bar number (which starts at 1) to lookup the date in an array (which starts at 0) */
+		window.location = "{% url 'silent_mammoth_whistle:index_by_date' date %}".slice(0,-10) + chartDates[whistlesChart.data.labels[res[0].index]-1]
+		
+	}
+</script>
