@@ -26,7 +26,6 @@ Installation
 
 2. Add to ``INSTALLED_APPS`` setting - ideally just above the main app::
 
-.. code-block:: python
 		INSTALLED_APPS = [
 			...,
 			"silent_mammoth_whistle",
