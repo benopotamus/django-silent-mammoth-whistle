@@ -24,6 +24,10 @@
 	
 }
 
+.hidden {
+	display:none;
+}
+
 body {
 	color: var(--blue-gray-1000);
 	font-family: var(--sl-font-sans);
@@ -197,6 +201,10 @@ td.actions {
 
 
 /* Session.html */
+.timestamp {
+	text-wrap: nowrap;
+}
+
 #whistles-header {
 	display: flex;
 	justify-content: space-between;
@@ -254,52 +262,11 @@ table .browser-change {
 }
 
 
-/* CSS-only elements */
+/* Buttons */
 .button-group {
 	display: flex;
 	gap: var(--sl-spacing-2x-small);
 }
-/* .button {
-	background-color: #FFFFFF;
-	box-sizing: border-box;
-	font-family: "Inter var",ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
-	font-size: .875rem;
-	font-weight: 600;
-	line-height: 1.25rem;
-	text-align: center;
-	text-decoration: none #D1D5DB solid;
-	text-decoration-thickness: auto;
-	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-	cursor: pointer;
-	user-select: none;
-	-webkit-user-select: none;
-	touch-action: manipulation;
-
-	display: flex;
-	width: fit-content;
-	/* border-radius: .5rem; */
-	/* padding: .75rem 1rem; */
-	/* border-radius: 80px;
-	padding: .75rem;
-	color: var(--blue-gray-700);
-	border: 1px solid var(--blue-gray-200);
-}
-.button:hover {
-	background-color: var(--blue-gray-200);
-	border-color: var(--blue-gray-300);
-	color: var(--blue-gray-800);
-}
-.button:focus {
-	outline: 2px solid transparent;
-	outline-offset: 2px;
-}
-.button:focus-visible {
-	box-shadow: none;
-} */
-
-
-
-/* CSS */
 .button {
   appearance: none;
   background-color: #FAFBFC;

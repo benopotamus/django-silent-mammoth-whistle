@@ -7,8 +7,8 @@
 	h1 {
 		margin: 0
 	}
-	.timestamp {
-		display:none;
+	.time-fromto:hover {
+		cursor: pointer;
 	}
 {% endblock %}
 
@@ -35,7 +35,7 @@
 		</div>
 		<div id="session-time">
 			<div class="duration"><sl-icon name="stopwatch"></sl-icon> {% time_duration min_time max_time %}</div>
-			<div class="time-fromto">{{ min_time|date:"H:i" }} to {{ max_time|date:"H:i" }}</div>
+			<div class="time-fromto" onclick="toggleTimestamps()">{{ min_time|date:"H:i" }} to {{ max_time|date:"H:i" }}</div>
 		</div>
 	</div>
 
@@ -43,6 +43,7 @@
 		<table class="primary{% if is_authenticated %} authed{% else %} unauthed{% endif %}">
 			<thead>
 				<tr>
+					<td class='timestamp hidden'>Timestamp</td>
 					<td class='number-cell' style="white-space: nowrap;">Time delta</td>
 					<td>Request</td>
 					<td>Response</td>
@@ -56,7 +57,7 @@
 						{% if not forloop.first %}
 							{% if whistle|browser_change:previous_whistle %}
 								<tr>
-									<td colspan=3>
+									<td colspan=4>
 										<div class="browser-change">
 											<em>Browser change:</em>
 											{% if whistle.useragent %}<div class="data"><sl-icon name="globe"></sl-icon> {{ whistle.useragent|ua_parse  }}</div>{% endif %}
@@ -68,13 +69,13 @@
 						{% endif %}
 
 						<tr{% if whistle.is_client_event %} class="client-event"{% endif %}>
+							<td class='timestamp hidden'>{{ whistle.datetime|date:'r' }}</td>
 							<td class='number-cell small-cell'>
 								{% if forloop.first %}
 									START
 								{% else %}
 									{% time_duration_condensed previous_whistle.datetime whistle.datetime %}
 								{% endif %}
-								<span class="timestamp">: {{ whistle.datetime|date:'r' }}</span>
 							</td>
 							<td>{{ whistle.request|html_tabs|small_guids }}</td>
 							<td>{{ whistle.response|html_tabs|small_guids }}</td>
@@ -89,4 +90,19 @@
 			</tbody>
 		</table>
 	</div>
+
+	<script>
+		const timestamps = document.querySelectorAll('.timestamp')
+		function toggleTimestamps() {
+			timestamps.forEach((item) => {
+				item.classList.toggle('hidden')
+			})
+
+			// Fix for Firefox rendering bug 😭
+			const table = document.querySelector('table')
+			const thead = document.querySelector('table thead')
+			table.removeChild(thead)
+    		table.appendChild(thead)
+		}
+	</script>
 {% endblock %}
