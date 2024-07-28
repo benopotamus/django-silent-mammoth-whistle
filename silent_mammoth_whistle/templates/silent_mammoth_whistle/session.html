@@ -77,8 +77,8 @@
 									{% time_duration_condensed previous_whistle.datetime whistle.datetime %}
 								{% endif %}
 							</td>
-							<td>{{ whistle.request|html_tabs|small_guids }}</td>
-							<td>{{ whistle.response|html_tabs|small_guids }}</td>
+							<td class='whistle-request'>{{ whistle.request|html_tabs|small_guids }}</td>
+							<td class='whistle-response'>{{ whistle.response|html_tabs|small_guids }}</td>
 						</tr>
 					{% endwith %}
 				{% endfor %}

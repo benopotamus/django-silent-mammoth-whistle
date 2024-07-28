@@ -256,11 +256,13 @@ table .browser-change {
 	color: var(--blue-gray-600);
 }
 
-.client-event td:nth-of-type(2) {
-	padding-left: 30px;
-  	font-style: italic;
+tr.client-event .whistle-request {
+	padding-left: var(--sl-spacing-x-large);
+	font-style: italic;
 }
-
+tr.client-event .whistle-response {
+	font-style: italic;
+}
 
 /* Buttons */
 .button-group {
