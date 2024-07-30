@@ -256,14 +256,6 @@ table .browser-change {
 	color: var(--blue-gray-600);
 }
 
-tr.client-event .whistle-request {
-	padding-left: var(--sl-spacing-x-large);
-	font-style: italic;
-}
-tr.client-event .whistle-response {
-	font-style: italic;
-}
-
 /* Buttons */
 .button-group {
 	display: flex;

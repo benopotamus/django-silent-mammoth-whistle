@@ -4,6 +4,11 @@
 {% block title %}{{ user_id}} on {{ date_str }}{% endblock %}
 
 {% block extra_styles %}
+	#body {
+		max-width: 1000px;
+		margin-left: auto;
+		margin-right: auto;
+	}
 	h1 {
 		margin: 0
 	}
@@ -77,8 +82,8 @@
 									{% time_duration_condensed previous_whistle.datetime whistle.datetime %}
 								{% endif %}
 							</td>
-							<td class='whistle-request'>{{ whistle.request|html_tabs|small_guids }}</td>
-							<td class='whistle-response'>{{ whistle.response|html_tabs|small_guids }}</td>
+							<td>{% if whistle.is_client_event %}CLIENT&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}{{ whistle.request|html_tabs|small_guids }}</td>
+							<td>{{ whistle.response|html_tabs|small_guids }}</td>
 						</tr>
 					{% endwith %}
 				{% endfor %}
