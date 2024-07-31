@@ -20,7 +20,7 @@
 {% block content %}
 
 	<div id="whistles-header">
-		<a href="{% url 'silent_mammoth_whistle:index_by_date' date %}" class="button">
+		<a href="{% url 'silent_mammoth_whistle:index_by_date' date %}" onclick="history.back();" class="button">
 			{% include "silent_mammoth_whistle/_icon_previous.svg" %}
 		</a>
 		<div id="user-header">

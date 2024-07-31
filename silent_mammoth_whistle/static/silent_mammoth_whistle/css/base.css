@@ -187,6 +187,9 @@ table.primary  tbody tr:last-of-type {
 #monthly-stats tr td:last-of-type {
 	padding-right: 0px;
 }
+#monthly-stats thead td {
+	color: var(--blue-gray-700);
+}
 
 .number-cell {
 	text-align: right;
