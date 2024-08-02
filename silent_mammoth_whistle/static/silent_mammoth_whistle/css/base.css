@@ -206,6 +206,7 @@ td.actions {
 /* Session.html */
 .timestamp {
 	text-wrap: nowrap;
+	width: 1%;
 }
 
 #whistles-header {
