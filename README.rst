@@ -67,7 +67,7 @@ settings.py
 	The name of a ``User`` model attribute that is used as the unqiue user identifier. It is displayed in the UI and is used for determining which web requests belong to which users.
 
 
-``WHISTLE_AUTO_LOG_REQUESTS``
+``WHISTLE_AUTO_LOG``
 
 	Defaults to ``True``
 
@@ -99,7 +99,7 @@ You can also record additional data for a request.
 
 	request.whistle.request('put a string here')
 
-Silent mammoth whistle is super-simple and the data for requests needs to be in a string format. You can record as much data as you like, and you can make as many of these ``request.whistle.request()`` calls as you like. Silent mammoth whistle will merge the strings from all the calls into a single string, separated by a tab when rendered.
+You can record as much data as you like, and you can make as many of these ``request.whistle.request()`` calls as you like. Silent mammoth whistle is super-simple and all data is cast to strings using ``str()`` before saving. Silent mammoth whistle will merge the strings from all the calls into a single string, separated by a tab when rendered.
 
 Practical example time! This line will record the fields present in a POST request. This could be useful if your form has many optional fields and you want to know which ones were included by the user.
 

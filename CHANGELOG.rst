@@ -3,8 +3,13 @@
 Changelog
 #########
 
-1.2.0 (3 August 2024)
+1.2.1 (3 August 2024)
 ====================
+
+Minor doco update. No functional changes.
+
+1.2.0 (3 August 2024)
+=====================
 
 I added a changelog! :-D
 
