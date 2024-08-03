@@ -1,10 +1,9 @@
-from http import HTTPStatus
 from django.conf import settings
 from django.http import HttpResponse
 from .forms import WhistleForm
 
 # Set up variables from settings file
-auto_log_requests = getattr(settings, 'WHISTLE_AUTO_LOG_REQUESTS', True)
+auto_log = getattr(settings, 'WHISTLE_AUTO_LOG', True)
 user_id_field = getattr(settings, 'WHISTLE_USER_ID_FIELD', 'id')
 client_event_path = getattr(settings, 'WHISTLE_CLIENT_EVENT_PATH', '/whistle')
 use_cookies = getattr(settings, 'WHISTLE_COOKIES', True)
@@ -15,14 +14,14 @@ class Whistle:
 		self._response = []
 
 	def request(self, *args):
-		self._request.extend(args)
+		self._request.extend(str(arg) for arg in args)
 
 	def response(self, *args):
-		self._response.extend(args)
+		self._response.extend(str(arg) for arg in args)
 
 
 class HttpResponseNoContent(HttpResponse):
-    status_code = HTTPStatus.NO_CONTENT
+    status_code = 204 # No content
 
 
 def save_whistle(request, is_client_event=False):
@@ -84,11 +83,14 @@ class SilentMammothWhistleMiddleware:
 
 		# Add the request type (GET, POST, etc) and url to the request
 		# This is just a convenient way of doing it. It could be done in the view, but more often than not, we will want these attributes so there's no need to manually whistle them each time.
-		if auto_log_requests:
+		if auto_log:
 			request.whistle.request(request.method, request.get_full_path())
 
 		# 2. Calling View part of lifecycle
 		response = self.get_response(request)
+
+		if auto_log:
+			request.whistle.response(f'{str(response.status_code)} {str(response.reason_phrase)}')
 
 		if use_cookies and 'viewport_dimensions' not in request.COOKIES:
 			response.set_cookie("viewport_dimensions") # Defaults to path=/
