@@ -25,7 +25,7 @@ class HttpResponseNoContent(HttpResponse):
 
 
 def save_whistle(request, is_client_event=False):
-	# Save whitle to database, but not for admins
+	# Save whistle to database, but not for admins
 	if not request.user.is_staff:
 		if len(request.whistle._request) or len(request.whistle._response):
 
@@ -90,7 +90,8 @@ class SilentMammothWhistleMiddleware:
 		response = self.get_response(request)
 
 		if auto_log:
-			request.whistle.response(f'{str(response.status_code)} {str(response.reason_phrase)}')
+			# This line is called after the view, and the view might have added things to the whistle.response object, so we use insert here so the http status code and reason are the first things printed in the table's response column
+			request.whistle._response.insert(0, f'{str(response.status_code)} {str(response.reason_phrase)}')
 
 		if use_cookies and 'viewport_dimensions' not in request.COOKIES:
 			response.set_cookie("viewport_dimensions") # Defaults to path=/

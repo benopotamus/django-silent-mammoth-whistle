@@ -3,6 +3,11 @@
 Changelog
 #########
 
+1.2.3 (14 August 2024)
+====================
+
+Silent mammoth whistle already ignores whistles from is_staff users. It now also removes the anonymous session whistles for users who eventually authenticate as an is_staff user.
+
 1.2.2 (14 August 2024)
 ====================
 

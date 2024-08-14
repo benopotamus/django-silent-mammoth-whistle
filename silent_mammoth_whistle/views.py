@@ -61,17 +61,17 @@ def adjust_day(date, direction):
     result_date_str = adjusted_date.strftime("%Y-%m-%d")
     return result_date_str
 
-def is_bot(ua_string):
-	'''
-	Returns true if user agent string looks like a bot
+# def is_bot(ua_string):
+# 	'''
+# 	Returns true if user agent string looks like a bot
 
-	Copied from shynet/analytics/tasks.py
-	'''
-	return (
-		ua_string.is_bot
-		or (ua_string.browser.family or "").strip().lower() == "googlebot"
-		or (ua_string.device.family or ua_string.device.model or "").strip().lower() == "spider"
-	)
+# 	Copied from shynet/analytics/tasks.py
+# 	'''
+# 	return (
+# 		ua_string.is_bot
+# 		or (ua_string.browser.family or "").strip().lower() == "googlebot"
+# 		or (ua_string.device.family or ua_string.device.model or "").strip().lower() == "spider"
+# 	)
 
 
 def create_chart_data(is_authenticated, requested_date):
