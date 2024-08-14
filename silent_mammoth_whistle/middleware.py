@@ -37,7 +37,7 @@ def save_whistle(request, is_client_event=False):
 					user_id = request.user.id
 			else:
 				# If user isn't logged in, we use their session_key as the user_id instead
-				# Without this, all requests from anonymous users are grouped into a single session
+				# Without this, all requests from anonymous users would be grouped into a single session
 				if not request.session.session_key:
 					request.session.save() # A session needs to be saved at least once to generate a session key. We don't want to save every time though, just if there's no key yet
 					request.session['anonymous_session_key'] = request.session.session_key # We make a copy of the key in the session object because the key changes when the user authenticates and we want to update whistle records that have the anonymous session key to use the user id when the user logs in - see signals.py

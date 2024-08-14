@@ -3,6 +3,11 @@
 Changelog
 #########
 
+1.2.2 (14 August 2024)
+====================
+
+Added missing dependency ``user-agents`` to ``setup.cfg``
+
 1.2.1 (3 August 2024)
 ====================
 
