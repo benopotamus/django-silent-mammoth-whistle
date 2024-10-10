@@ -1,4 +1,4 @@
-from django.db.models import Count, Min, Max, F, CharField
+from django.db.models import Count, Min, Max, F, CharField, Exists, OuterRef
 from django.db.models.functions import Concat
 from django.views.decorators.http import require_http_methods
 from django.template.response import TemplateResponse
@@ -61,18 +61,19 @@ def adjust_day(date, direction):
     result_date_str = adjusted_date.strftime("%Y-%m-%d")
     return result_date_str
 
-# def is_bot(ua_string):
-# 	'''
-# 	Returns true if user agent string looks like a bot
 
-# 	Copied from shynet/analytics/tasks.py
-# 	'''
-# 	return (
-# 		ua_string.is_bot
-# 		or (ua_string.browser.family or "").strip().lower() == "googlebot"
-# 		or (ua_string.device.family or ua_string.device.model or "").strip().lower() == "spider"
-# 	)
+'''
+This subquery is used when creating data for charts (create_chart_data) and for sessions themselves.
 
+It's used to check if any Whistle in the session is a 'PING'. Most malicious bots don't seem to execute the JavaScript that sends the 'PING' request
+Some good bots (like Google Bot and BingBot) do execute the 'PING' request so we just filter for 'bot' useragents as well
+'''	
+nonbot_whistles = (
+	Whistle.objects
+	.filter(user_id=OuterRef('user_id'), request='PING')
+	.exclude(useragent__icontains='bot')
+	.exclude(useragent__contains='HeadlessChrome')
+)
 
 def create_chart_data(is_authenticated, requested_date):
 	'''
@@ -80,13 +81,20 @@ def create_chart_data(is_authenticated, requested_date):
 	This function exists because roughly the same code needs to be called twice - once for authed and once for unauthed. It also makes the index view easier to read.
 	'''
 	# Get number of unique users per day during the month
-	data = Whistle.objects.filter(
-		is_authenticated=is_authenticated, # Using only authenticated sessions because the site gets so many unauthenticated spam sessions that it's not representative of user activity if unauthenticated is included
-		datetime__year=requested_date.year, 
-		datetime__month=requested_date.month
-	).values('datetime__date') \
-	.annotate(num_sessions=Count('user_id', distinct=True)) \
-	.order_by('datetime__date')
+	data = (
+		Whistle.objects
+		.filter(
+			is_authenticated=is_authenticated,
+			datetime__year=requested_date.year, 
+			datetime__month=requested_date.month)
+		.exclude(request='PING')
+		.values('datetime__date')
+		.annotate(
+			num_sessions=Count('user_id', distinct=True), 
+			nonbot=Exists(nonbot_whistles))
+		.filter(nonbot=True)
+		.order_by('datetime__date')
+	)
 
 	# Expand the above data so that each day either has the DB data above, or an entry of 0 for that day
 	start_date, end_date = get_start_end_dates(requested_date.year, requested_date.month)
@@ -137,36 +145,70 @@ def index(request, requested_date=None):
 	#	For each user that has 1 or more whistles that day
 	#		get the count of the whistles
 	#		get the time of the earliest whistle, and the latest whistle
-	authed_whistles_per_user = Whistle.objects.filter(is_authenticated=True, datetime__date=requested_date).values('user_id', 'datetime__date').annotate(num_whistles=Count("user_id"), min_time=Min('datetime'), max_time=Max('datetime')).order_by('-max_time')
+	authed_whistles_per_user = (
+		Whistle.objects
+		.filter(
+			is_authenticated=True, 
+			datetime__date=requested_date)
+		.exclude(request='PING')
+		.values('user_id', 'datetime__date')
+		.annotate(
+			num_whistles=Count('user_id'), 
+			min_time=Min('datetime'), 
+			max_time=Max('datetime'))
+		.order_by('-max_time') )
 
-	unauthed_whistles_per_user = Whistle.objects.filter(is_authenticated=False, datetime__date=requested_date).values('user_id', 'datetime__date').annotate(num_whistles=Count("user_id"), min_time=Min('datetime'), max_time=Max('datetime')).order_by('-num_whistles')
+	### Unauthed whistles pseudo code
+	#
+	# For the selected day,
+	#	For each user that has 1 or more whistles that day, and where one of the whistles is a PING
+	#		get the count of the whistles
+	#		get the time of the earliest whistle, and the latest whistle
+	unauthed_whistles_per_user = (
+		Whistle.objects
+		.filter(
+			is_authenticated=False, 
+			datetime__date=requested_date)
+		.exclude(request='PING')
+		.values('user_id', 'datetime__date')
+		.annotate(
+			num_whistles=Count('user_id'), 
+			min_time=Min('datetime'), 
+			max_time=Max('datetime'),
+			nonbot=Exists(nonbot_whistles))
+		.filter(nonbot=True)
+		.order_by('-num_whistles') )
 
 	# Top platform (browser, device, etc), and viewport dimensions
 	# These are per user in the given month. So if a user always has the same useragent, that will count as one. If they have 2 user agents in the month, that counts as 2. This is achieved by grouping the worthy whistles by useragent/viewport, and then counting the number of users who had that useragent/viewport.
 	# Programming note: values() groups the queryset by the value, and an annotate count can be on any field (not just values() ones)
 
-	worthy_useragents = Whistle.objects\
-		.exclude(useragent='')\
-		.filter(is_authenticated=True, datetime__year=requested_date.year, datetime__month=requested_date.month)\
-		.values('datetime__date', 'user_id', 'useragent')\
-		.distinct()\
-		.annotate(user_and_date=Concat(F('datetime__date') ,F('user_id'), output_field=CharField()))
-	top_useragents = worthy_useragents\
-		.values('useragent')\
-		.annotate(sessions=Count('user_and_date', distinct=True))\
-		.order_by('-sessions')[:5]
+	worthy_useragents = (
+		Whistle.objects
+		.exclude(useragent='')
+		.filter(is_authenticated=True, datetime__year=requested_date.year, datetime__month=requested_date.month)
+		.values('datetime__date', 'user_id', 'useragent')
+		.distinct()
+		.annotate(user_and_date=Concat(F('datetime__date'), F('user_id'), output_field=CharField())) )
+	top_useragents = (
+		worthy_useragents
+		.values('useragent')
+		.annotate(sessions=Count('user_and_date', distinct=True))
+		.order_by('-sessions')[:5] )
 	total_useragents = worthy_useragents.values('user_and_date').count()
 	
-	worthy_viewports = Whistle.objects\
-		.exclude(viewport_dimensions='')\
-		.filter(is_authenticated=True, datetime__year=requested_date.year, datetime__month=requested_date.month)\
-		.values('datetime__date', 'user_id', 'viewport_dimensions')\
-		.distinct()\
-		.annotate(user_and_date=Concat(F('datetime__date') ,F('user_id'), output_field=CharField()))
-	top_viewport_dimensions = worthy_viewports\
-		.values('viewport_dimensions')\
-		.annotate(sessions=Count('user_and_date', distinct=True))\
-		.order_by('-sessions')[:5]
+	worthy_viewports = (
+		Whistle.objects
+		.exclude(viewport_dimensions='')
+		.filter(is_authenticated=True, datetime__year=requested_date.year, datetime__month=requested_date.month)
+		.values('datetime__date', 'user_id', 'viewport_dimensions')
+		.distinct()
+		.annotate(user_and_date=Concat(F('datetime__date') ,F('user_id'), output_field=CharField())) 	)
+	top_viewport_dimensions = (
+		worthy_viewports
+		.values('viewport_dimensions')
+		.annotate(sessions=Count('user_and_date', distinct=True))
+		.order_by('-sessions')[:5] )
 	total_viewport_dimensions = worthy_viewports.values('user_and_date').count()
 
 	# Get a list of new users for the month
@@ -203,7 +245,7 @@ def session(request, user_id, requested_date):
 	'''
 	requested_date_with_tz = timezone.make_aware(datetime.fromisoformat(requested_date))
 	requested_date = date.fromisoformat(requested_date)
-	whistles = Whistle.objects.filter(datetime__date=requested_date_with_tz, user_id=user_id).order_by('datetime')
+	whistles = Whistle.objects.filter(datetime__date=requested_date_with_tz, user_id=user_id).exclude(request='PING').order_by('datetime')
 	min_time = whistles.first().datetime
 	max_time = whistles.last().datetime
 
