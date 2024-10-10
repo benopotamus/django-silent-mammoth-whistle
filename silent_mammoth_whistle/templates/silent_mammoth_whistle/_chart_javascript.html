@@ -7,16 +7,6 @@
 	const unauthed_hover = '#9fb3c8' // --blue-gray-400
 	const unauthed_inactive = '#D9E2EC' //--blue-gray-200
 
-	// Helper function to check if any bar in the stack is hovered
-	function isHovered(context) {
-		const index = context.dataIndex;
-		const datasets = context.chart.data.datasets;
-		return datasets.some((dataset) => {
-			const meta = context.chart.getDatasetMeta(datasets.indexOf(dataset));
-			return meta.data[index].$context.active;
-		});
-	}
-
 	const canvas = document.getElementById('whistles-chart')
 	const whistlesChart = new Chart(canvas, {
 		type: 'bar',
@@ -26,18 +16,15 @@
 				{
 					label: 'Logged in',
 					data: {{ authed_chart_data }},
-					//hoverBackgroundColor: authed_hover, 
-					hoverBackgroundColor: (context) => {
-						return isHovered(context) ? 'rgba(54, 162, 235, 0.8)' : 'rgba(54, 162, 235, 0.2)';
+					hoverBackgroundColor: authed_hover, 
+					backgroundColor: function(context) {
+						let index = context.dataIndex;
+						if (index === {{ day }}) { // Change index to the bar we want to highlight
+							return authed_active // Color for highlighted bar
+						} else {
+							return authed_inactive // Default color for other bars
+						}
 					},
-					// backgroundColor: function(context) {
-					// 	let index = context.dataIndex;
-					// 	if (index === {{ day }}) { // Change index to the bar we want to highlight
-					// 		return authed_active // Color for highlighted bar
-					// 	} else {
-					// 		return authed_inactive // Default color for other bars
-					// 	}
-					// },
 				},
 				{
 					label: 'Unauthenticated',
