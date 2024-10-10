@@ -1,4 +1,22 @@
 <script>
+	// Colors
+	const authed_active = '#724bb7' // --purple-500
+	const authed_hover = '#8662C7' // --purple-400
+	const authed_inactive = '#CFBCF2' // --purple-200
+	const unauthed_active = '#829AB1' // --blue-gray-500
+	const unauthed_hover = '#9fb3c8' // --blue-gray-400
+	const unauthed_inactive = '#D9E2EC' //--blue-gray-200
+
+	// Helper function to check if any bar in the stack is hovered
+	function isHovered(context) {
+		const index = context.dataIndex;
+		const datasets = context.chart.data.datasets;
+		return datasets.some((dataset) => {
+			const meta = context.chart.getDatasetMeta(datasets.indexOf(dataset));
+			return meta.data[index].$context.active;
+		});
+	}
+
 	const canvas = document.getElementById('whistles-chart')
 	const whistlesChart = new Chart(canvas, {
 		type: 'bar',
@@ -8,28 +26,29 @@
 				{
 					label: 'Logged in',
 					data: {{ authed_chart_data }},
-					hoverBackgroundColor: '#8662C7', // --purple-400
-					backgroundColor: function(context) {
-						// Change the color of the specific bar you want
-						let index = context.dataIndex;
-						if (index === {{ day }}) { // Change the index to the bar you want to highlight
-							return '#653CAD' // The color for the specific bar (--purple-600)
-						} else {
-							return '#CFBCF2' // Default color for other bars (--purple-200)
-						}
+					//hoverBackgroundColor: authed_hover, 
+					hoverBackgroundColor: (context) => {
+						return isHovered(context) ? 'rgba(54, 162, 235, 0.8)' : 'rgba(54, 162, 235, 0.2)';
 					},
+					// backgroundColor: function(context) {
+					// 	let index = context.dataIndex;
+					// 	if (index === {{ day }}) { // Change index to the bar we want to highlight
+					// 		return authed_active // Color for highlighted bar
+					// 	} else {
+					// 		return authed_inactive // Default color for other bars
+					// 	}
+					// },
 				},
 				{
 					label: 'Unauthenticated',
 					data: {{ unauthed_chart_data }},
-					hoverBackgroundColor: '#9fb3c8', // --blue-gray-400
+					hoverBackgroundColor: unauthed_hover, 
 					backgroundColor: function(context) {
-						// Change the color of the specific bar you want
 						let index = context.dataIndex;
-						if (index === {{ day }}) { // Change the index to the bar you want to highlight
-							return '#627d98' // The color for the specific bar (--blue-gray-600)
+						if (index === {{ day }}) { // Change index to the bar we want to highlight
+							return unauthed_active // Color for highlighted bar
 						} else {
-							return '#D9E2EC' // Default color for other bars (--blue-gray-200)
+							return unauthed_inactive // Default color for other bars
 						}
 					},
 				}
@@ -68,6 +87,7 @@
 				y: { grid: { display: false },
 					ticks: { precision: 0 },
 					stacked: true,
+					suggestedMax: 10,
 				}
 			},
 			onHover: (event, chartElement) => {
@@ -87,9 +107,6 @@
 		if (res.length === 0) {
 			return
 		}
-		// Alerts "You clicked on A" if you click the "A" chart
-		//alert('You clicked on ' + whistlesChart.data.labels[res[0].index]);
-		//console.log(whistlesChart.data.labels[res[0].index])
 
 		/* -1 is used because we're using chart bar number (which starts at 1) to lookup the date in an array (which starts at 0) */
 		window.location = "{% url 'silent_mammoth_whistle:index_by_date' date %}".slice(0,-10) + chartDates[whistlesChart.data.labels[res[0].index]-1]
