@@ -225,6 +225,15 @@ td.actions {
 	width: 1%;
 }
 
+#refer-row {
+	display: flex;
+	justify-content: space-between;
+}
+#referer-cell {
+	color: var(--blue-gray-700);
+	font-style: italic;
+}
+
 #whistles-header {
 	display: flex;
 	justify-content: space-between;

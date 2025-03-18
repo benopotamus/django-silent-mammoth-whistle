@@ -89,10 +89,24 @@
 								</td>
 							{% endif %}
 							<td>
+								{% comment %} On the first loop, this cell is split in two to show the whistle request on the left and the request referer on the right. {% endcomment %}
+								{% if forloop.first and whistle.referer %}
+									<div id='refer-row'>
+										<div>
+								{% endif %}
+
 								{% if autolog_request_path and whistle.request_path %}
 									{{ whistle.request_path|small_guids }}&nbsp;&nbsp;&nbsp;&nbsp;
 								{% endif %}
 								{{ whistle.request|html_tabs|small_guids }}
+
+								{% if forloop.first and whistle.referer %}
+										</div>
+										<div id='referer-cell'>
+											Referer: {{ whistle.referer }}
+										</div>
+									</div>
+								{% endif %}
 							</td>
 							<td>
 								{% if autolog_response_code and whistle.response_code %}

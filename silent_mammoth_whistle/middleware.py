@@ -55,9 +55,12 @@ def save_whistle(request, response, is_client_event=False):
 				'request_path': '' if is_client_event else request.path,
 				'response': "\t".join(request.whistle._response),
 				'response_code': response.status_code,
-				'useragent': str( dict.get(request.META, 'HTTP_USER_AGENT', '') ), # Set useragent to empty string if one isn't in headers
 				'is_authenticated': request.user.is_authenticated,
 				'viewport_dimensions': request.COOKIES.get('viewport_dimensions', ''),
+
+				# Save these meta values if present, or save an empty string if not
+				'referer': str( dict.get(request.META, 'HTTP_REFERER', '') ),
+				'useragent': str( dict.get(request.META, 'HTTP_USER_AGENT', '') ), 
 			}
 
 			form = WhistleForm(data=data)

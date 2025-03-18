@@ -39,7 +39,7 @@
 				<div id="chart-container">
 					<div class="little-title">Sessions per day</div>
 					<div style="height:250px"><canvas id="whistles-chart"></canvas></div>
-					<script src="{% static 'silent_mammoth_whistle\js\chart.min.js' %}"></script>
+					<script src="{% static 'silent_mammoth_whistle/js/chart.min.js' %}"></script>
 					{% include "silent_mammoth_whistle/_chart_javascript.html" %}
 				</div>
 				{% if top_useragents or top_viewport_dimensions %}

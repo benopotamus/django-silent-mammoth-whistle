@@ -3,6 +3,23 @@
 Changelog
 #########
 
+2.3 (18 Mar 2025)
+=================
+
+Improvements
+------------
+
+* Added ``referer`` url for the first request in a session
+
+Bug fixes
+---------
+
+Thank you **jbaack** for finding these.
+
+* Fixed incorrect path slashes when including ``chart.js`` in the ``index.html`` template
+* Fixed bug where the ``index`` view had an error if ``django-invitations`` was not installed
+* Active invitations (on index page) now only lists *unaccepted* invitations
+
 2.2 (23 December 2024)
 ======================
 

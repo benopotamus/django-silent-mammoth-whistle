@@ -25,6 +25,8 @@ class Whistle(models.Model):
 	response = models.TextField(blank=True)
 	response_code = models.IntegerField(default=0)
 
+	referer = models.TextField(blank=True)
+
 	datetime = models.DateTimeField(auto_now_add=True)
 	useragent = models.TextField(blank=True)
 	viewport_dimensions = models.TextField(blank=True)
