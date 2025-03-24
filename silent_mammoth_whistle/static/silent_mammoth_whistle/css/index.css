@@ -1,0 +1,124 @@
+#body {
+	max-width: fit-content;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: row;
+	gap: var(--sl-spacing-x-large);
+	/* flex-wrap: wrap; */
+}
+#chart-container {
+	padding: var(--sl-spacing-large);
+	padding-bottom: var(--sl-spacing-small);
+}
+
+#chart-and-tops {
+	display: flex;
+	flex-direction: column;
+	background-color: white;
+}
+#top-lists {
+	display: flex;
+	flex-direction: row;
+	gap: var(--sl-spacing-medium);
+	margin-top: var(--sl-spacing-medium);
+}
+
+.table-container-group {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--sl-spacing-x-large);
+}
+
+#tops-section .table-container:first-of-type {
+	/* Adds some extra spacing between the container columns.
+	It is styled this way so that when the flex container wraps on small screens - which effectively turns the columns into rows - this extra spacing can be removed.
+	This is better than just using gap because then we don't have to define at which px width the flex wrap should occur. */ 
+	margin-right: var(--sl-spacing-x-large);
+}
+
+#daily-stats {
+	/* Set size of daily stats container so next/previous buttons stay in same place when there are no whistles/sessions.
+	Monthly stats width is defined by the chart width as the chart is the widest element in #monthly-stats */
+	min-width: 660px;
+}
+
+#monthly-stats {
+	width: 740px;
+}
+
+#monthly-stats thead tr {
+	border-bottom: 1px solid var(--blue-gray-100);
+}
+#monthly-stats tr td:first-of-type {
+	padding-left: 0px;
+}
+#monthly-stats tr td:last-of-type {
+	padding-right: 0px;
+}
+#monthly-stats thead td {
+	color: var(--blue-gray-700);
+}
+.monthly-stats-section {
+	padding: var(--sl-spacing-large);
+	border-top: 1px solid var(--blue-gray-200)
+}
+
+#no-whistles-message {
+	text-align: center;
+	color: var(--blue-gray-600);
+	padding: var(--sl-spacing-3x-large);
+	font-style: italic;
+}
+#no-new-users-message {
+	font-size: var(--sl-font-size-small);
+}
+
+#whistles-per-user-tables {
+	display: flex;
+	flex-direction: column;
+}
+#whistles-per-user-tables #sessions-table-container:nth-child(2) {
+	border-top: 1px solid var(--blue-gray-200);
+}
+
+.main-cell {
+	width: 100%;
+}
+
+#sessions-table-container h2 {
+	margin: 0px 0px var(--sl-spacing-small) 0px;
+	font-weight: normal;
+	font-size: var(--sl-font-size-small);
+  	color: var(--blue-gray-700);
+}
+
+
+@media screen and (max-width: 1520px) {
+	/* Basic style changes for smaller screens */
+	#body {
+		flex-direction: column;
+	}
+	#monthly-stats {
+		width: auto;
+		max-width: 740px;
+	}
+	#daily-stats {
+		min-width: auto;
+	}
+	.nowrap {
+		white-space: initial;
+	}
+}
+@media screen and (max-width: 500px) {
+	#tops-section .table-container:first-of-type {
+		margin-right: 0px;
+	}
+}
+@media screen and (max-width: 450px) {
+	#tops-section {
+		flex-direction: column;
+	}
+	#tops-section table {
+		width: 100%;
+	}
+}

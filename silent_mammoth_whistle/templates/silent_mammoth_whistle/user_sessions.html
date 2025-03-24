@@ -1,0 +1,119 @@
+{% extends 'silent_mammoth_whistle/base.html' %}
+{% load static whistle_helpers %}
+{% block extra_styles %}
+	<link rel="stylesheet" href="{% static 'silent_mammoth_whistle/css/user-sessions.css' %}?v=1">
+{% endblock %}
+{% block title %}{{ user_id}}{% endblock %}
+
+{% block content %}
+
+	<div id="whistles-header">
+		{% comment %} {% url 'silent_mammoth_whistle:index_by_date' date %} {% endcomment %}
+		<a href="{{ request.META.HTTP_REFERER }}" onclick="history.back();" class="button">
+			{% include "silent_mammoth_whistle/_icon_previous.svg" %}
+		</a>
+		<div id="user-header">
+			<h1 class='heading large'><sl-icon name="person"></sl-icon> {{ user_id }}</h1>
+		</div>
+		<div></div>
+	</div>
+
+	<div id='main-area'>
+		<div id='user-sessions-table-container' class="container container-padding">
+			<h2 class="little-title">Sessions</h2>
+			<table class="primary{% if is_authenticated %} authed{% else %} unauthed{% endif %}">
+				<thead>
+					<tr>
+						<td class='main-cell'>Date</td>
+						<td class='number-cell'>Whistles</td>
+						<td class='number-cell'>Duration</td>
+						<td class='small-cell nowrap'></td>
+					</tr>
+				</thead>
+				<tbody>
+					{% for row in sessions %}
+						<tr>
+							<td class='main-cell'>{{ row.date|date:"j M y" }}</td>
+							<td class='number-cell nowrap'>
+								{{ row.num_whistles }}
+								{% if autolog_response_code %}
+									{% for code, count in row.status_counts.items %}
+										{% if count > 0 %}
+											<div class='status-code-count {% if code == "500" %}danger{% else %}warning{% endif %}'>{{ code }} · {{ count }}</div>
+										{% endif %}
+									{% endfor %}
+								{% endif %}
+							</td>
+							<td class='number-cell nowrap'>
+								<div>{% time_duration row.min_time row.max_time %}</div>
+								<div class='support-data'>{{ row.min_time|date:"H:i" }} to {{ row.max_time|date:"H:i" }}</div>
+							</td>
+							<td class='small-cell actions'>
+								<a href="{% url 'silent_mammoth_whistle:session' row.user_id row.date %}" class="button">
+									{% include "silent_mammoth_whistle/_icon_next.svg" %}
+								</a>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div style="flex:1">
+			<div class='container container-padding'>
+				<div class="little-title">Whistles per day (all time)</div>
+				<div id="chart-container"><canvas id="whistleChart"></canvas></div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			var ctx = document.getElementById('whistleChart').getContext('2d');
+
+			var data = {
+				labels: {{ chart_labels|safe }},
+				datasets: [{
+					label: 'Number of Whistles',
+					data: {{ chart_data_values|safe }},
+					backgroundColor: 'rgba(75, 192, 192, 0.6)',
+					borderColor: 'rgba(75, 192, 192, 1)',
+					borderWidth: 1
+				}]
+			};
+
+			new Chart(ctx, {
+				type: 'bar',
+				data: data,
+				options: {
+					responsive: true,
+					//maintainAspectRatio: false,  // Allow manual height/width
+		
+					plugins: {
+						legend: { display: false }  // Hide legend
+					},
+		
+					scales: {
+						x: { 
+							type: 'time',
+							time: { 
+								unit: 'day',
+								tooltipFormat: 'd-MMM-yy', // Format for tooltip
+								displayFormats: { day: 'd-MMM-yy' } // Format for x-axis ticks
+							},
+							grid: { display: false }, // Hide vertical grid lines
+							ticks: { autoSkip: true, maxTicksLimit: 10 } // Adjust tick density
+						},
+		
+						y: { 
+							beginAtZero: true,
+							grid: { display: false }, // Hide horizontal lines
+							ticks: { display: true } // Still show y-axis numbers
+						}
+					}
+				}
+			});
+		});
+	</script>
+{% endblock %}

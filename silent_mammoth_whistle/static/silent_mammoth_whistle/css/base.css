@@ -77,42 +77,6 @@ h1, h2 {
 	align-items: end;
 }
 
-#monthly-stats {
-	width: 740px;
-}
-
-#no-whistles-message {
-	text-align: center;
-	color: var(--blue-gray-600);
-	padding: var(--sl-spacing-3x-large);
-	font-style: italic;
-}
-#no-new-users-message {
-	font-size: var(--sl-font-size-small);
-}
-#chart-and-tops {
-	display: flex;
-	flex-direction: column;
-	background-color: white;
-}
-#chart-container {
-	padding: var(--sl-spacing-large);
-	padding-bottom: var(--sl-spacing-small);
-}
-.table-container-group {
-	display: flex;	
-	gap: var(--sl-spacing-3x-large);
-}
-.monthly-stats-section {
-	padding: var(--sl-spacing-large);
-	border-top: 1px solid var(--blue-gray-200)
-}
-#top-lists {
-	display: flex;
-	flex-direction: row;
-	gap: var(--sl-spacing-medium);
-	margin-top: var(--sl-spacing-medium);
-}
 .support-data {
 	font-size: var(--sl-font-size-small);
 	color: var(--blue-gray-600)
@@ -126,30 +90,8 @@ h1, h2 {
 	color: var(--sl-color-gray-600);
 }
 
-/* Set size of daily stats container so next/previous buttons stay in same place when there are no whistles/sessions.
-Monthly stats is controlled by the chart - which is the widest element */
-#daily-stats {
-	min-width: 660px;
-}
-
-#whistles-per-user-tables {
-	display: flex;
-	flex-direction: column;
-}
-#whistles-per-user-tables #sessions-table-container:nth-child(2) {
-	border-top: 1px solid var(--blue-gray-200);
-}
-#whistles-per-user-tables .main-cell {
-	width: 100%;
-}
 .nowrap {
 	white-space: nowrap;
-}
-#sessions-table-container h2 {
-	margin: 0px 0px var(--sl-spacing-small) 0px;
-	font-weight: normal;
-	font-size: var(--sl-font-size-small);
-  	color: var(--blue-gray-700);
 }
 
 
@@ -179,18 +121,7 @@ table.primary tbody tr {
 table.primary  tbody tr:last-of-type {
 	border-bottom: none;
 }
-#monthly-stats thead tr {
-	border-bottom: 1px solid var(--blue-gray-100);
-}
-#monthly-stats tr td:first-of-type {
-	padding-left: 0px;
-}
-#monthly-stats tr td:last-of-type {
-	padding-right: 0px;
-}
-#monthly-stats thead td {
-	color: var(--blue-gray-700);
-}
+
 
 .number-cell {
 	text-align: right;
@@ -215,75 +146,32 @@ td.actions {
 }
 
 
-/* Session.html */
-.timestamp {
-	text-wrap: nowrap;
-	width: 1%;
+@media screen and (max-width: 500px) {
+	#body {
+		padding: 0px;
+		max-width: 100%;
+	}
+	td {
+		padding: var(--sl-spacing-x-small);
+	}
+	td.actions {
+		width: 35px;
+	}
+	#whistles-per-user-tables table {
+		table-layout: fixed;
+  		width: 100%;
+	}
+	.main-cell {
+		width: auto;
+		overflow-wrap: break-word;
+	}
+	#chart-container,
+	.monthly-stats-section,
+	.container-padding {
+		padding: var(--sl-spacing-small);
+	}
 }
 
-.request-method {
-	width: 1%;
-}
-
-#refer-row {
-	display: flex;
-	justify-content: space-between;
-}
-#referer-cell {
-	color: var(--blue-gray-700);
-	font-style: italic;
-}
-
-#whistles-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: end;
-	margin-bottom: var(--sl-spacing-medium);
-}
-#session-time {
-	text-align: right;
-}
-#user-header {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-#user-header .secondary {
-	font-size: var(--sl-font-size-small);
-	color: var(--blue-gray-700);
-	display: flex;
-	align-items: center;
-}
-#whistles-header h1,
-#session-time .duration {
-	display: flex;
-	align-items: center;
-	gap: var(--sl-spacing-2x-small);
-}
-#session-time .duration {
-	font-size: var(--sl-font-size-small);
-}
-.chart-subheading {
-	margin-bottom: var(--sl-spacing-large);
-  	font-size: var(--sl-font-size-x-small);
-	color: var(--blue-gray-700);
-}
-
-.browser-change {
-	font-size: var(--sl-font-size-x-small);
-	width: fit-content;
-	padding: var(--sl-spacing-x-small) var(--sl-spacing-small);
-	display: flex;
-  	gap: var(--sl-spacing-medium);
-}
-.browser-change > .data {
-	display: flex;
-	align-items: center;
-	gap: var(--sl-spacing-2x-small);
-}
-table .browser-change {
-	color: var(--blue-gray-600);
-}
 
 /* Buttons */
 .button-group {

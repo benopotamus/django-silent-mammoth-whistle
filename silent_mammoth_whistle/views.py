@@ -30,8 +30,7 @@ def get_start_end_dates(year, month):
 	return start_date, end_date
 
 def adjust_month(date, direction):
-	'''
-	Returns a date that is the 1st of the month.
+	'''Returns a date that is the 1st of the month.
 
 	Direction can be "next", which increases the month by 1, or "previous": which reduces the month by 1
 	'''
@@ -54,8 +53,7 @@ def adjust_month(date, direction):
 	return result_date_str
 
 def adjust_day(date, direction):
-	'''
-	Returns a date that is one day forward or backwards in time.
+	'''Returns a date that is one day forward or backwards in time.
 
 	Direction can be "next", which increases the day by 1, or "previous": which reduces the day by 1
 	'''
@@ -69,12 +67,9 @@ def adjust_day(date, direction):
 	return result_date_str
 
 
-'''
-This subquery is used when creating data for charts (create_chart_data) and for sessions themselves.
-
-It's used to check if any Whistle in the session is a 'PING'. Most malicious bots don't seem to execute the JavaScript that sends the 'PING' request
-Some good bots (like Google Bot and BingBot) do execute the 'PING' request so we just filter for 'bot' useragents as well
-'''	
+# This subquery is used when creating data for charts (create_chart_data) and for sessions themselves.
+# It's used to check if any Whistle in the session is a 'PING'. Most malicious bots don't seem to execute the JavaScript that sends the 'PING' request
+# Some good bots (like Google Bot and BingBot) do execute the 'PING' request so we just filter for 'bot' useragents as well
 nonbot_whistles = (
 	Whistle.objects
 	.filter(user_id=OuterRef('user_id'), request='PING')
@@ -83,8 +78,7 @@ nonbot_whistles = (
 )
 
 def create_chart_data(is_authenticated, requested_date):
-	'''
-	Returns data, labels, and dates for the bar chart displayed on the index page
+	'''Returns data, labels, and dates for the bar chart displayed on the index page
 	This function exists because roughly the same code needs to be called twice - once for authed and once for unauthed. It also makes the index view easier to read.
 	'''
 	# Get number of unique users per day during the month
@@ -129,11 +123,33 @@ def create_chart_data(is_authenticated, requested_date):
 	return chart_data, chart_xaxis_labels, chart_dates
 
 
+def get_user_sessions_chart_data(sessions):
+    # Extract min/max date
+    if sessions.exists():
+        min_date = sessions.first()['min_time'].date()
+        max_date = sessions.last()['min_time'].date()
+    else:
+        return [], []  # No data, return empty lists
+
+    # Create a full date range dictionary with default values
+    date_range = {min_date + timedelta(days=i): 0 for i in range((max_date - min_date).days + 1)}
+
+    # Populate dictionary with actual data
+    for session in sessions:
+        session_date = session['min_time'].date()
+        date_range[session_date] = session['num_whistles']
+
+    # Convert to lists for Chart.js
+    labels = [d.strftime('%Y-%m-%d') for d in date_range.keys()]
+    data_values = list(date_range.values())
+
+    return labels, data_values
+
+
 @require_http_methods(["GET"])
 @staff_member_required
 def index(request, requested_date=None):
-	'''
-	The homepage of silent_mammoth_whistle. It displays the days sessions, and a graph of the month's unique sessions
+	'''The homepage of silent_mammoth_whistle. It displays the days sessions, and a graph of the month's unique sessions
 
 	requested_date should be of the form '2019-12-04'
 	'''
@@ -302,12 +318,11 @@ def index(request, requested_date=None):
 		'autolog_response_code': getattr(settings, 'WHISTLE_AUTOLOG_RESPONSE_CODE', True),
 	})
 
+
 @require_http_methods(["GET"])
 @staff_member_required
 def session(request, user_id, requested_date):
-	'''
-	Displays a table of all the whistles for the given user and date
-	'''
+	'''Displays a table of all the whistles for the given user and date'''
 	requested_date_with_tz = timezone.make_aware(datetime.fromisoformat(requested_date))
 	requested_date = date.fromisoformat(requested_date)
 	whistles = Whistle.objects.filter(datetime__date=requested_date_with_tz, user_id=user_id).exclude(request='PING').order_by('datetime')
@@ -329,3 +344,65 @@ def session(request, user_id, requested_date):
 		'autolog_response_code': getattr(settings, 'WHISTLE_AUTOLOG_RESPONSE_CODE', True),
 	})
 	# TODO change the autolog context variables and template stuff to be about whether each part should be displayed, which is about whether at least one of a autolog type exists
+
+
+@require_http_methods(["GET"])
+@staff_member_required
+def user_sessions(request, user_id=None):
+	'''Lists all sessions for the given user - with dates and whistle counts.'''
+
+	# Get the list of unique status codes for 4xx and 5xx responses.
+	status_codes = Whistle.objects.filter(
+		user_id=user_id,
+		response_code__gte=400
+	).exclude(request='PING').values_list('response_code', flat=True).distinct()
+
+	# Build annotations for each status code.
+	status_code_annotations = {
+		f'count_{code}': Count(
+			Case(
+				When(response_code=code, then=1),
+				output_field=IntegerField()
+			)
+		)
+		for code in status_codes
+	}
+
+	# Get all whistles for given user and group into sessions
+	sessions = (
+		Whistle.objects
+			.filter(user_id=user_id)
+			.exclude(request='PING')
+			.values('user_id', 'datetime__date', 'is_authenticated')
+			.annotate(
+				num_whistles=Count('user_id'), 
+				min_time=Min('datetime'), 
+				max_time=Max('datetime'),
+				**status_code_annotations)
+			.order_by('-min_time') )
+	
+	chart_labels, chart_data_values = get_user_sessions_chart_data(sessions)
+	is_authenticated = sessions.first()['is_authenticated']
+
+	# Reformat the data for template rendering
+	d = []
+	for item in sessions:
+		status_counts = {str(code): item.get(f'count_{code}', 0) for code in status_codes}
+		d.append({
+			'user_id': item['user_id'],
+			'date': item['datetime__date'],
+			'num_whistles': item['num_whistles'],
+			'min_time': item['min_time'],
+			'max_time': item['max_time'],
+			'status_counts': status_counts
+		})
+	sessions = d
+
+	return TemplateResponse(request, 'silent_mammoth_whistle/user_sessions.html', {
+		'user_id': user_id,
+		'sessions': sessions,
+		'chart_labels': chart_labels, 
+		'chart_data_values': chart_data_values,
+		'is_authenticated': is_authenticated,
+		'autolog_response_code': getattr(settings, 'WHISTLE_AUTOLOG_RESPONSE_CODE', True),
+	})

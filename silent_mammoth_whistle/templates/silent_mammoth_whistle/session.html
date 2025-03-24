@@ -1,26 +1,14 @@
 {% extends 'silent_mammoth_whistle/base.html' %}
-{% load whistle_helpers %}
-
-{% block title %}{{ user_id}} on {{ date_str }}{% endblock %}
-
+{% load static whistle_helpers %}
 {% block extra_styles %}
-	#body {
-		max-width: 1000px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-	h1 {
-		margin: 0
-	}
-	.time-fromto:hover {
-		cursor: pointer;
-	}
+	<link rel="stylesheet" href="{% static 'silent_mammoth_whistle/css/session.css' %}?v=7">
 {% endblock %}
+{% block title %}{{ user_id}} on {{ date_str }}{% endblock %}
 
 {% block content %}
 
 	<div id="whistles-header">
-		<a href="{% url 'silent_mammoth_whistle:index_by_date' date %}" onclick="history.back();" class="button">
+		<a href="{{ request.META.HTTP_REFERER }}" onclick="history.back();" class="button">
 			{% include "silent_mammoth_whistle/_icon_previous.svg" %}
 		</a>
 		<div id="user-header">
@@ -49,7 +37,7 @@
 			<thead>
 				<tr>
 					<td class='timestamp hidden'>Timestamp</td>
-					<td class='number-cell' style="white-space: nowrap;">Time delta</td>
+					<td id='time-column-header' class='number-cell'>Time delta</td>
 					{% comment %} If the request method is being shown, we add it to its own column so things are easier to read {% endcomment %}
 					<td{% if autolog_request_method %} colspan=2{% endif %}>Request</td>
 					<td>Response</td>
@@ -103,7 +91,7 @@
 								{% if forloop.first and whistle.referer %}
 										</div>
 										<div id='referer-cell'>
-											Referer: {{ whistle.referer }}
+											Referer: {{ whistle.referer|small_guids }}
 										</div>
 									</div>
 								{% endif %}

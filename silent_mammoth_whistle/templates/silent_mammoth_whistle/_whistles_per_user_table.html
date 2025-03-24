@@ -8,19 +8,18 @@
 				<td class='main-cell'>User</td>
 				<td class='number-cell'>Whistles</td>
 				<td class='number-cell'>Duration</td>
-				<td class='small-cell nowrap'></td>
+				<td class='small-cell actions'></td>
 			</tr>
 		</thead>
 		<tbody>
 			{% for row in whistles_per_user %}
 				<tr>
-					<td class='main-cell'>{{ row.user_id }}</td>
+					<td class='main-cell'><a href="{% url 'silent_mammoth_whistle:user_sessions' row.user_id %}">{{ row.user_id }}</a></td>
 					<td class='number-cell nowrap'>
 						{{ row.num_whistles }}
 						{% if autolog_response_code %}
 							{% for code, count in row.status_counts.items %}
 								{% if count > 0 %}
-									{% comment %} <sl-badge variant="{% if code == "500" %}danger{% else %}warning{% endif %}">{{ code }} ({{ count }})</sl-badge> {% endcomment %}
 									<div class='status-code-count {% if code == "500" %}danger{% else %}warning{% endif %}'>{{ code }} · {{ count }}</div>
 								{% endif %}
 							{% endfor %}

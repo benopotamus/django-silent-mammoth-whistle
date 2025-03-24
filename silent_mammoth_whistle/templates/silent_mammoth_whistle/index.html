@@ -1,17 +1,9 @@
 {% extends 'silent_mammoth_whistle/base.html' %}
 {% load static whistle_helpers %}
-
-{% block title %}Activity overview{% endblock %}
-
 {% block extra_styles %}
-	#body {
-		max-width: fit-content;
-		margin: 0 auto;
-		display: flex;
-		gap: var(--sl-spacing-x-large);
-		flex-wrap: wrap;
-	}
+	<link rel="stylesheet" href="{% static 'silent_mammoth_whistle/css/index.css' %}?v=1">
 {% endblock %}
+{% block title %}Activity overview{% endblock %}
 
 {% block content %}
 	{% comment %} Next and previous buttons for changing daily sessions uses hx-boost. We use hx-preserve here to stop the monthly data (mostly the chart) being recreated. {% endcomment %}
@@ -43,7 +35,7 @@
 					{% include "silent_mammoth_whistle/_chart_javascript.html" %}
 				</div>
 				{% if top_useragents or top_viewport_dimensions %}
-					<div class='monthly-stats-section table-container-group'>
+					<div id='tops-section' class='monthly-stats-section table-container-group'>
 						{% if top_useragents %}
 							<div class='table-container'>
 								<div class="little-title">Top platforms</div>
