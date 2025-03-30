@@ -24,7 +24,7 @@ class Whistle:
 
 
 class HttpResponseNoContent(HttpResponse):
-    status_code = 204 # No content
+	status_code = 204 # No content
 
 
 def save_whistle(request, response, is_client_event=False):
@@ -85,12 +85,22 @@ class SilentMammothWhistleMiddleware:
 		### 1. Request part of lifecycle
 		request.whistle = Whistle()
 
-		# If the whistle is from the client, log it as an event, and prevent request from reaching views.py by returning a response early
+		### If the whistle is from the client, log it as an event
 		if request.path == client_event_path:
-			request.whistle.request(request.POST.get('args', '')) # Add the 'args' data from the POST request to the whistle object
-			response = HttpResponseNoContent() # Prevent views.py from processing request (by not creating a new response with get_response)
-			save_whistle(request, response, is_client_event=True) # Save whistle
-			return response
+			form = request.POST.getlist('args')
+			# Return an HttpResponseNoContent response here so the client doesn't do anything
+			# This also stops the request being passed down to views.py
+			response = HttpResponseNoContent()
+
+			# Don't save requests to the whistle path that don't have any form data
+			if form is None:
+				return response
+			else:
+				# Add the 'args' data from the POST request to the whistle object
+				# The form in the request can have multiple 'args' values so we use getlist
+				request.whistle.request(*form)
+				save_whistle(request, response, is_client_event=True)
+				return response
 
 		### 2. Calling View part of lifecycle
 		response = self.get_response(request)

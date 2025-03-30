@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-silent-mammoth-whistle"
-version = "2.3"
+version = "2.4"
 description = "A super-simple user analytics tool that tracks user behaviour based on web requests to your Django app."
 readme = "README.rst"
 license = {text = "BSD-2-Clause"}

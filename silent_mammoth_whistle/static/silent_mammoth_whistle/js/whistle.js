@@ -5,7 +5,7 @@ function whistle(...args) {
 	// If the user defines the global variable whistleClientEventPath in their code, we use that url, otherwise we default to /whistle.
 	const _smwUrl = typeof whistleClientEventPath === 'string' ? whistleClientEventPath : '/whistle';
 	const formData = new FormData()
-	formData.append('args', args)
+	args.forEach(arg => formData.append('args', arg))
 	fetch(_smwUrl, { method: 'POST', body: formData })
 }
 

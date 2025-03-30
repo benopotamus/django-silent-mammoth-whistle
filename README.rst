@@ -126,13 +126,13 @@ Practical example time! This line will record the fields present in a POST reque
 
 .. code-block:: python
 
-	request.whistle.request('fields=' + ", ".join(request.POST.dict().keys()))
+	request.whistle.request('fields=' + ', '.join(request.POST.dict().keys()))
 
 When viewing session details in silent mammoth whistle, you'll see 3 columns: time, request, and response. Request is the obvious column to use, but you might like to separate tracking of what the user requested from how the server responded. E.g.
 
 .. code-block:: python
 
-	request.whistle.response('fields in error=' + ", ".join(form.errors.dict().keys()))
+	request.whistle.response('Fields in error = ' + ', '.join(form.errors.keys()))
 
 These calls all start with ``request.`` because silent mammoth whistle adds a ``whistle`` object to the standard Django ``request`` object.
 

@@ -3,6 +3,21 @@
 Changelog
 #########
 
+2.4 (30 Mar 2025)
+=================
+
+Improvements
+------------
+
+* Added a new page - user-sessions - which lists all sessions in the database for the selected user. User selection is done by clicking the user id on the home page.
+* Updated css to *better* support smaller screen sizes
+
+Bug fixes
+---------
+
+* When passing multiple arguments to the client side whistle function, they will now be correctly separated by tabs when rendered.
+* Client side whistles with no form data will no longer be logged - but they'll still return a 204 so the client doesn't process it as an error.
+
 2.3 (18 Mar 2025)
 =================
 
