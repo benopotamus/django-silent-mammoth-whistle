@@ -6,135 +6,149 @@
 {% block title %}Activity overview{% endblock %}
 
 {% block content %}
-	{% comment %} Next and previous buttons for changing daily sessions uses hx-boost. We use hx-preserve here to stop the monthly data (mostly the chart) being recreated. {% endcomment %}
-	<div id="monthly-stats" hx-preserve="true">
-		<div class="date-selection-heading">
-			<div>
-				<h1 class='heading title'>{{ chart_period }}</h1>
-				<div class="little-title">Monthly stats</div>
+	<div id="lhs-section">
+		{% comment %} Next and previous buttons for changing daily sessions uses hx-boost. We use hx-preserve here to stop the monthly data (mostly the chart) being recreated. {% endcomment %}
+		<div id="monthly-stats" hx-preserve="true">
+			<div class="date-selection-heading">
+				<div>
+					<h1 class='heading title'>{{ chart_period }}</h1>
+					<div class="little-title">Monthly stats</div>
+				</div>
+				<div class="button-group">
+					<a href="{% url 'silent_mammoth_whistle:index_by_date' previous_month %}" class="button">
+						{% include "silent_mammoth_whistle/_icon_previous.svg" %}
+					</a>
+					<a href="{% url 'silent_mammoth_whistle:index_by_date' next_month %}" class="button">
+						{% include "silent_mammoth_whistle/_icon_next.svg" %}
+					</a>
+				</div>
 			</div>
-			<div class="button-group">
-				<a href="{% url 'silent_mammoth_whistle:index_by_date' previous_month %}" class="button">
-					{% include "silent_mammoth_whistle/_icon_previous.svg" %}
-				</a>
-				<a href="{% url 'silent_mammoth_whistle:index_by_date' next_month %}" class="button">
-					{% include "silent_mammoth_whistle/_icon_next.svg" %}
-				</a>
-			</div>
+
+			{% comment %} This if statement hides daily stats as well as they're not relevant if the month doesn't even show {% endcomment %}
+			{% if not month_has_whistles %}
+				<div id="no-whistles-message" class='container'>No whistles for this month</div>
+			{% else %}
+				<div id="monthly-stats-content" class='container'>
+					<div id="chart-container">
+						<div class="little-title">Sessions per day</div>
+						<div style="height:250px"><canvas id="whistles-chart"></canvas></div>
+						<script src="{% static 'silent_mammoth_whistle/js/chart.min.js' %}"></script>
+						{% include "silent_mammoth_whistle/_chart_javascript.html" %}
+					</div>
+					<div class='monthly-stats-container-row'>
+						<div class='monthly-stats-section'>
+							<div class='table-container'>
+								<div class="little-title">Users (logged in)</div>
+								{% if not users %}
+									<div id="no-new-users-message">No new users this month</div>
+								{% else %}
+									<table class='small'>
+										<thead>
+											<tr>
+												<td>User</td>
+												<td>Sessions</td>
+											</tr>
+										</thead>
+										<tbody>
+											{% for user in users %}
+												<tr>
+													<td class='main-cell'>
+														<a href="{% url 'silent_mammoth_whistle:user_sessions' user.user_id %}">{{ user.user_id }}</a>
+														{% if user.is_new %}
+															<sl-tag variant="success" size="small">New</sl-tag>
+														{% endif %}
+													</td>
+													<td class='number-cell'>{{ user.sessions }}</td>
+												</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								{% endif %}
+							</div>
+						</div>
+						{% if top_useragents or top_viewport_dimensions %}
+							<div id='tops-section' class='monthly-stats-section'>
+								{% if top_useragents %}
+									<div class='table-container'>
+										<div class="little-title">Top platforms</div>
+										<table class='small'>
+											<thead>
+												<tr>
+													<td>Platform</td>
+													<td class='number-cell nowrap'>% of sessions</td>
+												</tr>
+											</thead>
+											<tbody>
+												{% for item in top_useragents %}
+													<tr>
+														<td class='main-cell nowrap'>{{ item.useragent|ua_parse }}</td>
+														<td class='number-cell'>{% percentage item.sessions total_useragents %}&nbsp;&nbsp;<span class='support-data'>{{ item.sessions }}</span></td>
+													</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									</div>
+								{% endif %}
+								{% if top_viewport_dimensions %}
+									<div class='table-container'>
+										<div class="little-title">Top screen sizes</div>
+										<table class='small'>
+											<thead>
+												<tr>
+													<td>Dimensions</td>
+													<td class='number-cell nowrap'>% of sessions</td>
+												</tr>
+											</thead>
+											<tbody>
+												{% for item in top_viewport_dimensions %}
+													<tr>
+														<td class='main-cell'>{{ item.viewport_dimensions }}</td>
+														<td class='number-cell'>{% percentage item.sessions total_viewport_dimensions %}&nbsp;&nbsp;<span class='support-data'>{{ item.sessions }}</td>
+													</tr>
+												{% endfor %}
+											</tbody>
+										</table>
+									</div>
+								{% endif %}
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			{% endif %}
 		</div>
 
-		{% comment %} This if statement hides daily stats as well as they're not relevant if the month doesn't even show {% endcomment %}
-		{% if not month_has_whistles %}
-			<div id="no-whistles-message" class='container'>No whistles for this month</div>
-		{% else %}
-			<div id="chart-and-tops" class='container'>
-				<div id="chart-container">
-					<div class="little-title">Sessions per day</div>
-					<div style="height:250px"><canvas id="whistles-chart"></canvas></div>
-					<script src="{% static 'silent_mammoth_whistle/js/chart.min.js' %}"></script>
-					{% include "silent_mammoth_whistle/_chart_javascript.html" %}
+		{% comment %} Many projects won't have django-invitations installed so this html is only used when they do {% endcomment %}
+		{% if invitations %}
+			<div id='django-invitations-section' class='table-container container container-padding'>
+				<div class="little-title">
+					<sl-icon name="envelope-paper"></sl-icon>
+					Active invitations
 				</div>
-				{% if top_useragents or top_viewport_dimensions %}
-					<div id='tops-section' class='monthly-stats-section table-container-group'>
-						{% if top_useragents %}
-							<div class='table-container'>
-								<div class="little-title">Top platforms</div>
-								<table>
-									<thead>
-										<tr>
-											<td>Platform</td>
-											<td class='number-cell'>% of sessions</td>
-										</tr>
-									</thead>
-									<tbody>
-										{% for item in top_useragents %}
-											<tr>
-												<td>{{ item.useragent|ua_parse }}</td>
-												<td class='number-cell'>{% percentage item.sessions total_useragents %}&nbsp;&nbsp;<span class='support-data'>{{ item.sessions }}</span></td>
-											</tr>
-										{% endfor %}
-									</tbody>
-								</table>
-							</div>
-						{% endif %}
-						{% if top_viewport_dimensions %}
-							<div class='table-container'>
-								<div class="little-title">Top screen sizes</div>
-								<table>
-									<thead>
-										<tr>
-											<td>Dimensions</td>
-											<td class='number-cell'>% of sessions</td>
-										</tr>
-									</thead>
-									<tbody>
-										{% for item in top_viewport_dimensions %}
-											<tr>
-												<td>{{ item.viewport_dimensions }}</td>
-												<td class='number-cell'>{% percentage item.sessions total_viewport_dimensions %}&nbsp;&nbsp;<span class='support-data'>{{ item.sessions }}</td>
-											</tr>
-										{% endfor %}
-									</tbody>
-								</table>
-							</div>
-						{% endif %}
-					</div>
+				{% if invitations|length == 0 %}
+					<div id="no-new-users-message">No active invitations</div>
+				{% else %}
+					<table class='small'>
+						<thead>
+							<tr>
+								<td>Recipient</td>
+								<td class='number-cell nowrap'>Datetime sent</td>
+							</tr>
+						</thead>
+						<tbody>
+							{% for invitation in invitations %}
+								<tr>
+									<td class='main-cell'>{{ invitation.email }}</td>
+									<td class='number-cell nowrap'>{{ invitation.sent|date:"j M h:i" }}</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
 				{% endif %}
-				<div class='monthly-stats-section table-container-group'>
-					<div class='table-container'>
-						<div class="little-title">New users</div>
-						{% if not new_users %}
-							<div id="no-new-users-message">No new users this month</div>
-						{% else %}
-							<table>
-								<thead>
-									<tr>
-										<td>User</td>
-										<td>Date joined</td>
-									</tr>
-								</thead>
-								<tbody>
-									{% for user in new_users %}
-										<tr>
-											<td>{{ user|preferred_user_id }}</td>
-											<td>{{ user.date_joined|date:"j M" }}</td>
-										</tr>
-									{% endfor %}
-								</tbody>
-							</table>
-						{% endif %}
-					</div>
-					{% comment %} Many projects won't have django-invitations installed so this html is only used when they do {% endcomment %}
-					{% if invitations %}
-						<div class='table-container'>
-							<div class="little-title">Active invitations</div>
-							{% if invitations|length == 0 %}
-								<div id="no-new-users-message">No active invitations</div>
-							{% else %}
-								<table>
-									<thead>
-										<tr>
-											<td>Recipient</td>
-											<td>Datetime sent</td>
-										</tr>
-									</thead>
-									<tbody>
-										{% for invitation in invitations %}
-											<tr>
-												<td>{{ invitation.email }}</td>
-												<td>{{ invitation.sent|date:"j M h:i" }}</td>
-											</tr>
-										{% endfor %}
-									</tbody>
-								</table>
-							{% endif %}
-						</div>
-					{% endif %}
-				</div>
 			</div>
 		{% endif %}
 	</div>
 
+	{% comment %} Start of the selected day's sessions (RHS column) {% endcomment %}
 	{% block daily_stats %}
 		<div id="daily-stats">
 			{% if month_has_whistles %}

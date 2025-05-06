@@ -21,7 +21,7 @@
 	<div id='main-area'>
 		<div id='user-sessions-table-container' class="container container-padding">
 			<h2 class="little-title">Sessions</h2>
-			<table class="primary{% if is_authenticated %} authed{% else %} unauthed{% endif %}">
+			<table class="clickable-rows primary{% if is_authenticated %} authed{% else %} unauthed{% endif %}">
 				<thead>
 					<tr>
 						<td class='main-cell'>Date</td>
@@ -32,7 +32,7 @@
 				</thead>
 				<tbody>
 					{% for row in sessions %}
-						<tr>
+					<tr class='nav-row' onclick="window.location='{% url 'silent_mammoth_whistle:session' row.user_id row.date %}'">
 							<td class='main-cell'>{{ row.date|date:"j M y" }}</td>
 							<td class='number-cell nowrap'>
 								{{ row.num_whistles }}
@@ -49,9 +49,10 @@
 								<div class='support-data'>{{ row.min_time|date:"H:i" }} to {{ row.max_time|date:"H:i" }}</div>
 							</td>
 							<td class='small-cell actions'>
-								<a href="{% url 'silent_mammoth_whistle:session' row.user_id row.date %}" class="button">
-									{% include "silent_mammoth_whistle/_icon_next.svg" %}
-								</a>
+								<sl-icon-button
+									name='chevron-right'
+									label='Session details'
+									href="{% url 'silent_mammoth_whistle:session' row.user_id row.date %}"></sl-icon-button>
 							</td>
 						</tr>
 					{% endfor %}

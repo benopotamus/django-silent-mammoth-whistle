@@ -12,7 +12,10 @@
 			{% include "silent_mammoth_whistle/_icon_previous.svg" %}
 		</a>
 		<div id="user-header">
-			<h1 class='heading large'><sl-icon name="person"></sl-icon> {{ user_id }}</h1>
+			<h1 class='heading large'>
+				<sl-icon name="person"></sl-icon>
+				<a class='subtle-link'href="{% url 'silent_mammoth_whistle:user_sessions' user_id %}">{{ user_id }}</a>
+			</h1>
 			<div>{{ date_str }}</div>
 			<div class='secondary'>
 				<div class="browser-change">

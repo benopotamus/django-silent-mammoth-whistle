@@ -1,13 +1,12 @@
 from django.conf import settings
-from django.db.models import Count, Min, Max, F, CharField, Exists, OuterRef, Case, When, IntegerField
+from django.db.models import Count, Min, Max, F, CharField, Exists, Case, When, IntegerField
 from django.db.models.functions import Concat
 from django.views.decorators.http import require_http_methods
 from django.template.response import TemplateResponse
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth import get_user_model
 from django.utils.dateformat import format as format_date
 from django.utils import timezone
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 try:
 	from invitations.utils import get_invitation_model
@@ -15,141 +14,14 @@ try:
 except ModuleNotFoundError:
 	Invitation = None
 
-from .models import *
-from .forms import *
-
-
-def get_start_end_dates(year, month):
-	# Calculate the first day of the month
-	start_date = date(year, month, 1)
-	# Calculate the last day of the month
-	if month == 12:
-		end_date = date(year + 1, 1, 1) - timedelta(days=1)
-	else:
-		end_date = date(year, month + 1, 1) - timedelta(days=1)
-	return start_date, end_date
-
-def adjust_month(date, direction):
-	'''Returns a date that is the 1st of the month.
-
-	Direction can be "next", which increases the month by 1, or "previous": which reduces the month by 1
-	'''
-	if direction == "next":
-		new_month = date.month + 1
-		new_year = date.year
-		if new_month > 12:
-			new_month = 1
-			new_year += 1
-	elif direction == "previous":
-		new_month = date.month - 1
-		new_year = date.year
-		if new_month < 1:
-			new_month = 12
-			new_year -= 1
-	else:
-		raise ValueError("The direction parameter must be 'next' or 'previous'")
-	# Create the new date string in the format yyyy-mm-01
-	result_date_str = f"{new_year:04d}-{new_month:02d}-01"
-	return result_date_str
-
-def adjust_day(date, direction):
-	'''Returns a date that is one day forward or backwards in time.
-
-	Direction can be "next", which increases the day by 1, or "previous": which reduces the day by 1
-	'''
-	if direction == "next":
-		adjusted_date = date + timedelta(days=1)
-	elif direction == "previous":
-		adjusted_date = date - timedelta(days=1)
-	else:
-		raise ValueError("The direction parameter must be 'next' or 'previous'")
-	result_date_str = adjusted_date.strftime("%Y-%m-%d")
-	return result_date_str
-
-
-# This subquery is used when creating data for charts (create_chart_data) and for sessions themselves.
-# It's used to check if any Whistle in the session is a 'PING'. Most malicious bots don't seem to execute the JavaScript that sends the 'PING' request
-# Some good bots (like Google Bot and BingBot) do execute the 'PING' request so we just filter for 'bot' useragents as well
-nonbot_whistles = (
-	Whistle.objects
-	.filter(user_id=OuterRef('user_id'), request='PING')
-	.exclude(useragent__icontains='bot')
-	.exclude(useragent__contains='HeadlessChrome')
-)
-
-def create_chart_data(is_authenticated, requested_date):
-	'''Returns data, labels, and dates for the bar chart displayed on the index page
-	This function exists because roughly the same code needs to be called twice - once for authed and once for unauthed. It also makes the index view easier to read.
-	'''
-	# Get number of unique users per day during the month
-	data = (
-		Whistle.objects
-		.filter(
-			is_authenticated=is_authenticated,
-			datetime__year=requested_date.year, 
-			datetime__month=requested_date.month)
-		.exclude(request='PING')
-		.values('datetime__date')
-		.annotate(
-			num_sessions=Count('user_id', distinct=True), 
-			nonbot=Exists(nonbot_whistles))
-		.filter(nonbot=True)
-		.order_by('datetime__date')
-	)
-
-	# Expand the above data so that each day either has the DB data above, or an entry of 0 for that day
-	start_date, end_date = get_start_end_dates(requested_date.year, requested_date.month)
-	dates_with_data = {entry['datetime__date'] for entry in data}
-
-	chart_xaxis_labels = []
-	chart_data = []
-	chart_dates = []
-
-	# Iterate over a range of dates between start and end dates
-	current_date = start_date
-	while current_date <= end_date:
-		chart_dates.append(str(current_date))
-		chart_xaxis_labels.append(current_date.day)
-
-		if current_date in dates_with_data:
-			entry = next(entry for entry in data if entry['datetime__date'] == current_date)
-			chart_data.append(entry['num_sessions'])
-		else:
-			chart_data.append(0)
-
-		# Move to the next date
-		current_date += timedelta(days=1)
-
-	return chart_data, chart_xaxis_labels, chart_dates
-
-
-def get_user_sessions_chart_data(sessions):
-    # Extract min/max date
-    if sessions.exists():
-        min_date = sessions.first()['min_time'].date()
-        max_date = sessions.last()['min_time'].date()
-    else:
-        return [], []  # No data, return empty lists
-
-    # Create a full date range dictionary with default values
-    date_range = {min_date + timedelta(days=i): 0 for i in range((max_date - min_date).days + 1)}
-
-    # Populate dictionary with actual data
-    for session in sessions:
-        session_date = session['min_time'].date()
-        date_range[session_date] = session['num_whistles']
-
-    # Convert to lists for Chart.js
-    labels = [d.strftime('%Y-%m-%d') for d in date_range.keys()]
-    data_values = list(date_range.values())
-
-    return labels, data_values
+from . import view_helpers
+from .models import Whistle
 
 
 @require_http_methods(["GET"])
 @staff_member_required
 def index(request, requested_date=None):
-	'''The homepage of silent_mammoth_whistle. It displays the days sessions, and a graph of the month's unique sessions
+	'''The homepage of silent_mammoth_whistle. It displays the days sessions, and a graph of the month's unique sessions.
 
 	requested_date should be of the form '2019-12-04'
 	'''
@@ -160,10 +32,9 @@ def index(request, requested_date=None):
 	else:
 		requested_date = date.fromisoformat(requested_date)
 	
-	authed_chart_data, chart_xaxis_labels, chart_dates = create_chart_data(True, requested_date)
-	unauthed_chart_data = create_chart_data(False, requested_date)[0]
+	authed_chart_data, chart_xaxis_labels, chart_dates = view_helpers.create_chart_data(True, requested_date)
+	unauthed_chart_data = view_helpers.create_chart_data(False, requested_date)[0]
 
-	
 
 	# Get the list of unique status codes for 4xx and 5xx responses.
 	status_codes = Whistle.objects.filter(
@@ -233,7 +104,7 @@ def index(request, requested_date=None):
 			num_whistles=Count('user_id'), 
 			min_time=Min('datetime'), 
 			max_time=Max('datetime'),
-			nonbot=Exists(nonbot_whistles),
+			nonbot=Exists(view_helpers.nonbot_whistles_query),
 			**status_code_annotations)
 		.filter(nonbot=True)
 		.order_by('-num_whistles') )
@@ -284,9 +155,6 @@ def index(request, requested_date=None):
 		.order_by('-sessions')[:5] )
 	total_viewport_dimensions = worthy_viewports.values('user_and_date').count()
 
-	# Get a list of new users for the month
-	new_users = get_user_model().objects.filter(is_superuser=False, last_login__isnull=False, date_joined__year=requested_date.year, date_joined__month=requested_date.month).order_by('date_joined')
-
 	# Get active django-invitations (https://github.com/jazzband/django-invitations) if that package is in the project
 	if Invitation:
 		invitations = Invitation.objects.filter(accepted=False)
@@ -305,15 +173,15 @@ def index(request, requested_date=None):
 		'authed_whistles_per_user': authed_whistles_per_user,
 		'unauthed_whistles_per_user': unauthed_whistles_per_user,
 		'month_has_whistles': any(authed_chart_data + unauthed_chart_data),
-		'next_month': adjust_month(requested_date, 'next'),
-		'previous_month': adjust_month(requested_date, 'previous'),
-		'next_day': adjust_day(requested_date, 'next'),
-		'previous_day': adjust_day(requested_date, 'previous'),
+		'next_month': view_helpers.adjust_month(requested_date, 'next'),
+		'previous_month': view_helpers.adjust_month(requested_date, 'previous'),
+		'next_day': view_helpers.adjust_day(requested_date, 'next'),
+		'previous_day': view_helpers.adjust_day(requested_date, 'previous'),
 		'top_useragents': top_useragents,
 		'total_useragents': total_useragents,
 		'top_viewport_dimensions': top_viewport_dimensions,
 		'total_viewport_dimensions': total_viewport_dimensions,
-		'new_users': new_users,
+		'users': view_helpers.users_for_month(requested_date.year, requested_date.month),
 		'invitations': invitations,
 		'autolog_response_code': getattr(settings, 'WHISTLE_AUTOLOG_RESPONSE_CODE', True),
 	})
@@ -381,7 +249,7 @@ def user_sessions(request, user_id=None):
 				**status_code_annotations)
 			.order_by('-min_time') )
 	
-	chart_labels, chart_data_values = get_user_sessions_chart_data(sessions)
+	chart_labels, chart_data_values = view_helpers.get_user_sessions_chart_data(sessions)
 	is_authenticated = sessions.first()['is_authenticated']
 
 	# Reformat the data for template rendering

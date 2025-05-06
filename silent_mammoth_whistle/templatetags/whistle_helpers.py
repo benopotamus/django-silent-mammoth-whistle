@@ -80,15 +80,6 @@ def small_guids(str):
 	return mark_safe(re.sub(guid_pattern, replace_guid, str))
 
 @register.filter
-def preferred_user_id(user):
-	user_id_field = getattr(settings, 'WHISTLE_USER_ID_FIELD', 'id')
-	try:
-		return getattr(user, user_id_field)
-	except AttributeError:
-		# If the user object doesn't have an attribute with the name specified in user_id_field, just use user.id instead
-		return user.id
-
-@register.filter
 def forloop_next(some_list, current_index):
 	"""
 	Returns the next element of the list using the current index if it exists.

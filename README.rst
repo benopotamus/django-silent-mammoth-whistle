@@ -4,7 +4,6 @@ Django Silent Mammoth Whistle
 A super-simple user analytics tool that tracks user behaviour based on web requests to your Django app.
 
 .. image:: docs/example.jpeg
-   :alt: Example of the main page in Silent Mammoth Whistle
    :width: 800px
    :align: center
 

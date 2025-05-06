@@ -3,6 +3,18 @@
 Changelog
 #########
 
+2.5 (07 May 2025)
+=================
+
+Improvements
+------------
+
+* Replaced the monthly new users table with a monthly "Logged in users" table. This new table lists the users who made an authenticated whistle during the month. New users are marked with a "new" tag.
+* Clicking a row in the main page Sessions table now navigates to the details page for that session
+* Toned down the styling for the userid hyperlinks (which navigate to the all sessions page for that user)
+* CSS tweaks for smaller screen sizes
+
+
 2.4 (30 Mar 2025)
 =================
 
@@ -10,7 +22,7 @@ Improvements
 ------------
 
 * Added a new page - user-sessions - which lists all sessions in the database for the selected user. User selection is done by clicking the user id on the home page.
-* Updated css to *better* support smaller screen sizes
+* Updated CSS to *better* support smaller screen sizes
 
 Bug fixes
 ---------

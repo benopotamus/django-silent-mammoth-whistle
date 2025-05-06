@@ -2,7 +2,7 @@
 
 <div id='sessions-table-container' class="container-padding">
 	<h2 class="little-title">{% if is_authenticated %}Logged in{% else %}Unauthenticated{% endif %}</h2>
-	<table class="primary{% if is_authenticated %} authed{% else %} unauthed{% endif %}">
+	<table class="clickable-rows primary{% if is_authenticated %} authed{% else %} unauthed{% endif %}">
 		<thead>
 			<tr>
 				<td class='main-cell'>User</td>
@@ -13,8 +13,10 @@
 		</thead>
 		<tbody>
 			{% for row in whistles_per_user %}
-				<tr>
-					<td class='main-cell'><a href="{% url 'silent_mammoth_whistle:user_sessions' row.user_id %}">{{ row.user_id }}</a></td>
+				<tr class='nav-row' onclick="window.location='{% url 'silent_mammoth_whistle:session' row.user_id date %}'">
+					<td class='main-cell'>
+						<a href="{% url 'silent_mammoth_whistle:user_sessions' row.user_id %}">{{ row.user_id }}</a>
+					</td>
 					<td class='number-cell nowrap'>
 						{{ row.num_whistles }}
 						{% if autolog_response_code %}
@@ -25,14 +27,15 @@
 							{% endfor %}
 						{% endif %}
 					</td>
-					<td class='number-cell nowrap'>
+					<td class='number-cell duration-cell nowrap'>
 						<div>{% time_duration row.min_time row.max_time %}</div>
 						<div class='support-data'>{{ row.min_time|date:"H:i" }} to {{ row.max_time|date:"H:i" }}</div>
 					</td>
 					<td class='small-cell actions'>
-						<a href="{% url 'silent_mammoth_whistle:session' row.user_id date %}" class="button">
-							{% include "silent_mammoth_whistle/_icon_next.svg" %}
-						</a>
+						<sl-icon-button
+							name='chevron-right'
+							label='Session details'
+							href="{% url 'silent_mammoth_whistle:session' row.user_id date %}"></sl-icon-button>
 					</td>
 				</tr>
 			{% endfor %}

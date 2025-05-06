@@ -11,29 +11,40 @@
 	padding-bottom: var(--sl-spacing-small);
 }
 
-#chart-and-tops {
+#monthly-stats-content {
 	display: flex;
 	flex-direction: column;
 	background-color: white;
 }
+.monthly-stats-container-row {
+	display: flex;
+}
+.monthly-stats-container-row .monthly-stats-section {
+	flex: 1;
+}
+.monthly-stats-container-row .monthly-stats-section:not(:last-of-type) {
+	border-right: 1px solid var(--blue-gray-200);
+}
+#monthly-stats-content .monthly-stats-container-row {
+	flex-wrap: wrap;
+}
+
+
 #top-lists {
 	display: flex;
 	flex-direction: row;
 	gap: var(--sl-spacing-medium);
 	margin-top: var(--sl-spacing-medium);
 }
+#tops-section {
+	display: flex;
+	flex-direction: column;
+	gap: var(--sl-spacing-x-large);
+}
 
 .table-container-group {
 	display: flex;
 	flex-wrap: wrap;
-	gap: var(--sl-spacing-x-large);
-}
-
-#tops-section .table-container:first-of-type {
-	/* Adds some extra spacing between the container columns.
-	It is styled this way so that when the flex container wraps on small screens - which effectively turns the columns into rows - this extra spacing can be removed.
-	This is better than just using gap because then we don't have to define at which px width the flex wrap should occur. */ 
-	margin-right: var(--sl-spacing-x-large);
 }
 
 #daily-stats {
@@ -42,20 +53,26 @@
 	min-width: 660px;
 }
 
-#monthly-stats {
-	width: 740px;
+#lhs-section {
+	display: flex;
+	flex-direction: column;
+	gap: var(--sl-spacing-x-small);
 }
 
-#monthly-stats thead tr {
+#monthly-stats {
+	width: 800px;
+}
+
+table.small thead tr {
 	border-bottom: 1px solid var(--blue-gray-100);
 }
-#monthly-stats tr td:first-of-type {
+table.small tr td:first-of-type {
 	padding-left: 0px;
 }
-#monthly-stats tr td:last-of-type {
+table.small tr td:last-of-type {
 	padding-right: 0px;
 }
-#monthly-stats thead td {
+table.small thead td {
 	color: var(--blue-gray-700);
 }
 .monthly-stats-section {
@@ -85,11 +102,22 @@
 	width: 100%;
 }
 
+#sessions-table-container {
+	padding-bottom: var(--sl-spacing-x-small);
+}
 #sessions-table-container h2 {
 	margin: 0px 0px var(--sl-spacing-small) 0px;
 	font-weight: normal;
 	font-size: var(--sl-font-size-small);
   	color: var(--blue-gray-700);
+}
+
+#django-invitations-section .little-title {
+	display: flex;
+	gap: var(--sl-spacing-x-small);
+}
+#django-invitations-section .main-cell {
+	width: auto;
 }
 
 
@@ -98,6 +126,9 @@
 	#body {
 		flex-direction: column;
 	}
+	table {
+		width: 100%;
+	}
 	#monthly-stats {
 		width: auto;
 		max-width: 740px;
@@ -105,20 +136,12 @@
 	#daily-stats {
 		min-width: auto;
 	}
-	.nowrap {
+	#sessions-table-container .nowrap {
 		white-space: initial;
 	}
 }
-@media screen and (max-width: 500px) {
-	#tops-section .table-container:first-of-type {
-		margin-right: 0px;
-	}
-}
-@media screen and (max-width: 450px) {
-	#tops-section {
-		flex-direction: column;
-	}
-	#tops-section table {
-		width: 100%;
+@media screen and (max-width: 600px) {
+	.monthly-stats-container-row .monthly-stats-section:not(:last-of-type) {
+		border-right: 0px;
 	}
 }

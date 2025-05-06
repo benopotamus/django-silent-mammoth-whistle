@@ -106,9 +106,9 @@ table.primary thead tr {
 	color: white;
 }
 table.authed thead tr { background-color: var(--purple-500); }
-table.authed tbody tr:hover { background-color: var(--purple-100); }
+table.authed.clickable-rows tbody tr:hover { background-color: var(--purple-100); }
 table.unauthed thead tr { background-color: var(--blue-gray-500); }
-table.unauthed tbody tr:hover { background-color: var(--blue-gray-100); }
+table.unauthed.clickable-rows tbody tr:hover { background-color: var(--blue-gray-100); }
 
 th,
 td {
@@ -122,6 +122,21 @@ table.primary  tbody tr:last-of-type {
 	border-bottom: none;
 }
 
+table a,
+.subtle-link {
+	color: var(--blue-gray-1000);
+	text-decoration: none;
+}
+table a:hover,
+.subtle-link:hover {
+	color: var(--sl-color-primary-600);
+	text-decoration: underline;
+}
+
+tr.nav-row {
+	cursor: default;
+}
+
 
 .number-cell {
 	text-align: right;
@@ -132,6 +147,12 @@ table.primary  tbody tr:last-of-type {
 }
 td.actions {
 	vertical-align: middle;
+	padding-left: 0px;
+	padding-right: 8px;
+}
+.duration-cell {
+	/* This extra padding compensates for the slight text overflow caused by `vertical-align: baseline` on all td's. */
+	padding-bottom: var(--sl-spacing-medium);
 }
 
 .status-code-count {
@@ -172,6 +193,16 @@ td.actions {
 	}
 }
 
+
+/* A pattern of having a little button link next to a user id that takes the user to a page with a list of the selected user's sessions */
+.user-id-link {
+	display: flex;
+	align-items: center;
+	gap: var(--sl-spacing-x-small);
+}
+.user-id-link > .button {
+	padding: 6px;
+}
 
 /* Buttons */
 .button-group {

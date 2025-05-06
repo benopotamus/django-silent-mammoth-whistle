@@ -14,6 +14,12 @@ class Whistle(models.Model):
 
 	user_id = models.TextField()
 	
+	# TODO 
+	#user_id = models.CharField(max_length=36, null=True, blank=True, db_index=True)
+	#user_id = models.CharField(max_length=36)
+	
+
+	
 	request = models.TextField(blank=True)
 	request_method = models.CharField(
         max_length=10,
