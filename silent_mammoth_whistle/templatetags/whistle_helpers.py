@@ -120,8 +120,8 @@ def ua_is_bot(ua_string):
 	ua = user_agents.parse(ua_string)
 	return (
 		ua.is_bot
-		or (ua.browser.family or "").strip().lower() == "googlebot"
-		or (ua.device.family or ua.device.model or "").strip().lower() == "spider"
+		or "bot" in (ua.browser.family or ua.device.model or "").strip().lower()
+		or "spider" in (ua.device.family or ua.device.model or "").strip().lower()
 	)
 
 @register.filter

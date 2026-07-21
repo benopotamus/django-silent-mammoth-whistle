@@ -1,7 +1,7 @@
 {% extends 'silent_mammoth_whistle/base.html' %}
 {% load static whistle_helpers %}
 {% block extra_styles %}
-	<link rel="stylesheet" href="{% static 'silent_mammoth_whistle/css/session.css' %}?v=7">
+	<link rel="stylesheet" href="{% static 'silent_mammoth_whistle/css/session.css' %}?v=8">
 {% endblock %}
 {% block title %}{{ user_id}} on {{ date_str }}{% endblock %}
 
@@ -9,20 +9,24 @@
 
 	<div id="whistles-header">
 		<a href="{{ request.META.HTTP_REFERER }}" onclick="history.back();" class="button">
-			{% include "silent_mammoth_whistle/_icon_previous.svg" %}
+			{% include "silent_mammoth_whistle/icons/chevron-left.svg" %}
 		</a>
 		<div id="user-header">
 			<h1 class='heading large'>
-				<sl-icon name="person"></sl-icon>
+				{% include "silent_mammoth_whistle/icons/person.svg" %}
 				<a class='subtle-link'href="{% url 'silent_mammoth_whistle:user_sessions' user_id %}">{{ user_id }}</a>
 			</h1>
 			<div>{{ date_str }}</div>
 			<div class='secondary'>
 				<div class="browser-change">
-					{% if useragent %}<div class="data"><sl-icon name="globe"></sl-icon> {{ useragent|ua_parse }}</div>{% endif %}
+					{% if useragent %}
+						<div class="data">
+							{% include "silent_mammoth_whistle/icons/globe.svg" %} {{ useragent|ua_parse }}
+						</div>
+					{% endif %}
 					{% if viewport_dimensions %}
 						<div class="data">
-							<sl-icon name="display"></sl-icon>
+							{% include "silent_mammoth_whistle/icons/display.svg" %}
 							{{ viewport_dimensions }}
 						</div>
 					{% endif %}
@@ -30,7 +34,7 @@
 			</div>
 		</div>
 		<div id="session-time">
-			<div class="duration"><sl-icon name="stopwatch"></sl-icon> {% time_duration min_time max_time %}</div>
+			<div class="duration">{% include "silent_mammoth_whistle/icons/stopwatch.svg" %} {% time_duration min_time max_time %}</div>
 			<div class="time-fromto" onclick="toggleTimestamps()">{{ min_time|date:"H:i" }} to {{ max_time|date:"H:i" }}</div>
 		</div>
 	</div>
@@ -42,7 +46,7 @@
 					<td class='timestamp hidden'>Timestamp</td>
 					<td id='time-column-header' class='number-cell'>Time delta</td>
 					{% comment %} If the request method is being shown, we add it to its own column so things are easier to read {% endcomment %}
-					<td{% if autolog_request_method %} colspan=2{% endif %}>Request</td>
+					<td{% if show_request_method %} colspan=2{% endif %}>Request</td>
 					<td>Response</td>
 				</tr>
 			</thead>
@@ -54,18 +58,18 @@
 						{% if not forloop.first %}
 							{% if whistle|browser_change:previous_whistle %}
 								<tr>
-									<td {% if autolog_request_method %}colspan=5{% else %}colspan=4{% endif %}>
+									<td {% if show_request_method %}colspan=5{% else %}colspan=4{% endif %}>
 										<div class="browser-change">
 											<em>Browser change:</em>
-											{% if whistle.useragent %}<div class="data"><sl-icon name="globe"></sl-icon> {{ whistle.useragent|ua_parse  }}</div>{% endif %}
-											{% if whistle.viewport_dimensions %}<div class="data"><sl-icon name="arrows-fullscreen"></sl-icon> {{ whistle.viewport_dimensions }}</div>{% endif %}
+											{% if whistle.useragent %}<div class="data">{% include "silent_mammoth_whistle/icons/globe.svg" %} {{ whistle.useragent|ua_parse  }}</div>{% endif %}
+											{% if whistle.viewport_dimensions %}<div class="data">{% include "silent_mammoth_whistle/icons/arrows-fullscreen.svg" %} {{ whistle.viewport_dimensions }}</div>{% endif %}
 										</div>
 									</td>
 								</tr>
 							{% endif %}
 						{% endif %}
 
-						<tr class='{% if autolog_response_code and whistle.response_code >= 400 and whistle.response_code <= 499 %}warning{% elif autolog_response_code and whistle.response_code >= 500 and whistle.response_code <= 599 %}danger{% endif %}'>
+						<tr class='{% if show_response_code and whistle.response_code >= 400 and whistle.response_code <= 499 %}warning{% elif show_response_code and whistle.response_code >= 500 and whistle.response_code <= 599 %}danger{% endif %}'>
 							<td class='timestamp hidden'>{{ whistle.datetime|date:'r' }}</td>
 							<td class='number-cell small-cell'>
 								{% if forloop.first %}
@@ -74,7 +78,7 @@
 									{% time_duration_condensed previous_whistle.datetime whistle.datetime %}
 								{% endif %}
 							</td>
-							{% if autolog_request_method %}
+							{% if show_request_method %}
 								<td class='request-method'>
 									{{ whistle.request_method }}
 								</td>
@@ -86,7 +90,7 @@
 										<div>
 								{% endif %}
 
-								{% if autolog_request_path and whistle.request_path %}
+								{% if show_request_path and whistle.request_path %}
 									{{ whistle.request_path|small_guids }}&nbsp;&nbsp;&nbsp;&nbsp;
 								{% endif %}
 								{{ whistle.request|html_tabs|small_guids }}
@@ -100,7 +104,7 @@
 								{% endif %}
 							</td>
 							<td>
-								{% if autolog_response_code and whistle.response_code %}
+								{% if show_response_code and whistle.response_code %}
 									<abbr title="{{ whistle.response_code|reason_phrase }}">{{ whistle.response_code }}</abbr>&nbsp;&nbsp;&nbsp;&nbsp;
 								{% endif %}
 								{{ whistle.response|html_tabs|small_guids }}
@@ -111,7 +115,7 @@
 				<tr>
 					<td class='timestamp hidden'></td>
 					<td class='number-cell small-cell'>END</td>
-					{% if autolog_request_method %}
+					{% if show_request_method %}
 						<td></td>
 					{% endif %}
 					<td></td>

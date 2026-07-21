@@ -19,7 +19,7 @@
 					</td>
 					<td class='number-cell nowrap'>
 						{{ row.num_whistles }}
-						{% if autolog_response_code %}
+						{% if show_response_code %}
 							{% for code, count in row.status_counts.items %}
 								{% if count > 0 %}
 									<div class='status-code-count {% if code == "500" %}danger{% else %}warning{% endif %}'>{{ code }} · {{ count }}</div>

@@ -3,6 +3,18 @@
 Changelog
 #########
 
+3.0.1 (21 Jul 2026)
+===================
+
+Improvements
+------------
+
+* Significantly increased speed of queries on home page - on both Postgres and SQLite (though Postgres is still the faster of the two)
+* Added optional caching. Set ``WHISTLE_CACHE`` to ``True`` in settings to enable. This hasn't been extensively tested.
+* Bars in the home page Monthly Stats chart now have a striped pattern when a session in that day has a 4xx or 5xx response code
+* Removed Shoelace dependency. All files are locally hosted with your project now.
+
+
 2.5 (07 May 2025)
 =================
 

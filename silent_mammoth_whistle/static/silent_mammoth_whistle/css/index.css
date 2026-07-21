@@ -3,12 +3,12 @@
 	margin: 0 auto;
 	display: flex;
 	flex-direction: row;
-	gap: var(--sl-spacing-x-large);
+	gap: var(--wa-space-xl);
 	/* flex-wrap: wrap; */
 }
 #chart-container {
-	padding: var(--sl-spacing-large);
-	padding-bottom: var(--sl-spacing-small);
+	padding: var(--wa-space-l);
+	padding-bottom: var(--wa-space-s);
 }
 
 #monthly-stats-content {
@@ -33,13 +33,13 @@
 #top-lists {
 	display: flex;
 	flex-direction: row;
-	gap: var(--sl-spacing-medium);
-	margin-top: var(--sl-spacing-medium);
+	gap: var(--wa-space-m);
+	margin-top: var(--wa-space-m);
 }
 #tops-section {
 	display: flex;
 	flex-direction: column;
-	gap: var(--sl-spacing-x-large);
+	gap: var(--wa-space-xl);
 }
 
 .table-container-group {
@@ -56,7 +56,7 @@
 #lhs-section {
 	display: flex;
 	flex-direction: column;
-	gap: var(--sl-spacing-x-small);
+	gap: var(--wa-space-xs);
 }
 
 #monthly-stats {
@@ -76,18 +76,18 @@ table.small thead td {
 	color: var(--blue-gray-700);
 }
 .monthly-stats-section {
-	padding: var(--sl-spacing-large);
+	padding: var(--wa-space-l);
 	border-top: 1px solid var(--blue-gray-200)
 }
 
 #no-whistles-message {
 	text-align: center;
 	color: var(--blue-gray-600);
-	padding: var(--sl-spacing-3x-large);
+	padding: var(--wa-space-3xl);
 	font-style: italic;
 }
 #no-new-users-message {
-	font-size: var(--sl-font-size-small);
+	font-size: var(--wa-font-size-s);
 }
 
 #whistles-per-user-tables {
@@ -103,18 +103,18 @@ table.small thead td {
 }
 
 #sessions-table-container {
-	padding-bottom: var(--sl-spacing-x-small);
+	padding-bottom: var(--wa-space-xs);
 }
 #sessions-table-container h2 {
-	margin: 0px 0px var(--sl-spacing-small) 0px;
+	margin: 0px 0px var(--wa-space-s) 0px;
 	font-weight: normal;
-	font-size: var(--sl-font-size-small);
+	font-size: var(--wa-font-size-s);
   	color: var(--blue-gray-700);
 }
 
 #django-invitations-section .little-title {
 	display: flex;
-	gap: var(--sl-spacing-x-small);
+	gap: var(--wa-space-xs);
 }
 #django-invitations-section .main-cell {
 	width: auto;

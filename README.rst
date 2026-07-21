@@ -47,7 +47,7 @@ Installation
 			'silent_mammoth_whistle.middleware.SilentMammothWhistleMiddleware',
 		]
 	
-4. Include the silent mammoth whistle URLconf in your project urls.py. The URL (e.g. ``/mammoth``) can be anything you like::
+4. Include the Silent Mammoth Whistle URLconf in your project urls.py. The URL (e.g. ``/mammoth``) can be anything you like::
 	
 		urlpatterns = [
 			...,
@@ -107,11 +107,21 @@ settings.py
 	
 	When this is True, a count of 4xx and 5xx response codes is also displayed next to each session on the main page, and 4xx and 5xx responses are given an orange/red color when viewing the whistle details for a session.
 
+``WHISTLE_CACHE``
+
+	Defaults to ``False``
+
+	Enables caching for the homepage queries (charts,etc). Everything older than the current day is cached. See https://docs.djangoproject.com/en/6.1/topics/cache/ for details on configuring cache.
+	
+``WHISTLE_CACHE_TIMEOUT``
+
+	Defaults to 30 days.
+
 
 Usage
 =====
 
-By default, silent mammoth whistle will record all web requests (specifically the HTTP method, response code, and path/URL).
+By default, Silent Mammoth Whistle will record all web requests (specifically the HTTP method, response code, and path/URL).
 
 You can also record additional data for a request.
 
@@ -119,21 +129,23 @@ You can also record additional data for a request.
 
 	request.whistle.request('put a string here')
 
-You can record as much data as you like, and you can make as many of these ``request.whistle.request()`` calls as you like. Silent mammoth whistle is super-simple and all data is cast to strings using ``str()`` before saving. Silent mammoth whistle will merge the strings from all the calls into a single string, separated by a tab when rendered.
+You can record as much data as you like, and you can make as many of these ``request.whistle.request()`` calls as you like. Silent Mammoth Whistle is super-simple and all data is cast to strings using ``str()`` before saving. Silent Mammoth Whistle will merge the strings from all the calls into a single string, separated by a tab when rendered.
 
-Practical example time! This line will record the fields present in a POST request. This could be useful if your form has many optional fields and you want to know which ones were included by the user.
+**Practical example time!**
+
+This line will record the fields present in a POST request. This could be useful if your form has many optional fields and you want to know which ones were included by the user.
 
 .. code-block:: python
 
 	request.whistle.request('fields=' + ', '.join(request.POST.dict().keys()))
 
-When viewing session details in silent mammoth whistle, you'll see 3 columns: time, request, and response. Request is the obvious column to use, but you might like to separate tracking of what the user requested from how the server responded. E.g.
+When viewing session details in Silent Mammoth Whistle, you'll see 3 columns: time, request, and response. Request is the obvious column to use, but you might like to separate tracking of what the user requested from how the server responded. E.g. capture which fields were in error in a form submission.
 
 .. code-block:: python
 
 	request.whistle.response('Fields in error = ' + ', '.join(form.errors.keys()))
 
-These calls all start with ``request.`` because silent mammoth whistle adds a ``whistle`` object to the standard Django ``request`` object.
+These calls all start with ``request.`` because Silent Mammoth Whistle adds a ``whistle`` object to the standard Django ``request`` object.
 
 JavaScript API
 ==============

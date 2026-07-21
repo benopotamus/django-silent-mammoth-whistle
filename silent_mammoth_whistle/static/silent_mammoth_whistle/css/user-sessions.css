@@ -6,12 +6,13 @@
 
 #whistles-header {
 	display: flex;
-	gap: var(--sl-spacing-small);
+	align-items: center;
+	gap: var(--wa-space-s);
 }
 #whistles-header h1 {
 	display: flex;
 	align-items: center;
-	gap: var(--sl-spacing-2x-small);
+	gap: var(--wa-font-size-2xs);
   }
 
 #user-sessions-table-container {
@@ -19,7 +20,7 @@
 }
 #main-area {
 	display: flex;
-	gap: var(--sl-spacing-large);
+	gap: var(--wa-space-l);
 }
 #chart-container {
 	max-width: 930px;

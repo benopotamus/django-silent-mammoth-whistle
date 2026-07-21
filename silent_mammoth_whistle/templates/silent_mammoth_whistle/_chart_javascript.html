@@ -7,6 +7,41 @@
 	const unauthed_hover = '#9fb3c8' // --blue-gray-400
 	const unauthed_inactive = '#D9E2EC' //--blue-gray-200
 
+	// 1 for each day of the month that had at least one 4xx or 5xx response. Bars for those days are drawn with a striped pattern.
+	const errorDays = {{ chart_error_flags }}
+
+	// Returns a diagonally striped CanvasPattern tinted with the given base color. Patterns are cached per color.
+	const stripedPatterns = {}
+	function stripedPattern(baseColor) {
+		if (stripedPatterns[baseColor]) {
+			return stripedPatterns[baseColor]
+		}
+		const size = 8
+		const tile = document.createElement('canvas')
+		tile.width = size
+		tile.height = size
+		const tileCtx = tile.getContext('2d')
+		tileCtx.fillStyle = baseColor
+		tileCtx.fillRect(0, 0, size, size)
+		tileCtx.strokeStyle = 'rgba(0, 0, 0, 0.25)'
+		tileCtx.lineWidth = 2
+		tileCtx.beginPath()
+		// Three parallel diagonal lines so the tile repeats seamlessly
+		tileCtx.moveTo(-size / 2, size / 2); tileCtx.lineTo(size / 2, -size / 2)
+		tileCtx.moveTo(0, size); tileCtx.lineTo(size, 0)
+		tileCtx.moveTo(size / 2, size * 1.5); tileCtx.lineTo(size * 1.5, size / 2)
+		tileCtx.stroke()
+		const pattern = tile.getContext('2d').createPattern(tile, 'repeat')
+		stripedPatterns[baseColor] = pattern
+		return pattern
+	}
+
+	// Returns the color for a bar: active color for the selected day, otherwise the inactive color, striped if the day had 4xx/5xx errors.
+	function barBackground(index, activeColor, inactiveColor) {
+		const color = index === {{ day }} ? activeColor : inactiveColor
+		return errorDays[index] ? stripedPattern(color) : color
+	}
+
 	const canvas = document.getElementById('whistles-chart')
 	const whistlesChart = new Chart(canvas, {
 		type: 'bar',
@@ -17,27 +52,13 @@
 					label: 'Logged in',
 					data: {{ authed_chart_data }},
 					hoverBackgroundColor: authed_hover, 
-					backgroundColor: function(context) {
-						let index = context.dataIndex;
-						if (index === {{ day }}) { // Change index to the bar we want to highlight
-							return authed_active // Color for highlighted bar
-						} else {
-							return authed_inactive // Default color for other bars
-						}
-					},
+					backgroundColor: (context) => barBackground(context.dataIndex, authed_active, authed_inactive),
 				},
 				{
 					label: 'Unauthenticated',
 					data: {{ unauthed_chart_data }},
 					hoverBackgroundColor: unauthed_hover, 
-					backgroundColor: function(context) {
-						let index = context.dataIndex;
-						if (index === {{ day }}) { // Change index to the bar we want to highlight
-							return unauthed_active // Color for highlighted bar
-						} else {
-							return unauthed_inactive // Default color for other bars
-						}
-					},
+					backgroundColor: (context) => barBackground(context.dataIndex, unauthed_active, unauthed_inactive),
 				}
 			]
 		},

@@ -1,7 +1,7 @@
 {% extends 'silent_mammoth_whistle/base.html' %}
 {% load static whistle_helpers %}
 {% block extra_styles %}
-	<link rel="stylesheet" href="{% static 'silent_mammoth_whistle/css/index.css' %}?v=1">
+	<link rel="stylesheet" href="{% static 'silent_mammoth_whistle/css/index.css' %}?v=2">
 {% endblock %}
 {% block title %}Activity overview{% endblock %}
 
@@ -16,10 +16,10 @@
 				</div>
 				<div class="button-group">
 					<a href="{% url 'silent_mammoth_whistle:index_by_date' previous_month %}" class="button">
-						{% include "silent_mammoth_whistle/_icon_previous.svg" %}
+						{% include "silent_mammoth_whistle/icons/chevron-left.svg" %}
 					</a>
 					<a href="{% url 'silent_mammoth_whistle:index_by_date' next_month %}" class="button">
-						{% include "silent_mammoth_whistle/_icon_next.svg" %}
+						{% include "silent_mammoth_whistle/icons/chevron-right.svg" %}
 					</a>
 				</div>
 			</div>
@@ -38,7 +38,7 @@
 					<div class='monthly-stats-container-row'>
 						<div class='monthly-stats-section'>
 							<div class='table-container'>
-								<div class="little-title">Users (logged in)</div>
+								<div class="little-title">{% include "silent_mammoth_whistle/icons/person.svg" %} Users (logged in)</div>
 								{% if not users %}
 									<div id="no-new-users-message">No new users this month</div>
 								{% else %}
@@ -55,7 +55,7 @@
 													<td class='main-cell'>
 														<a href="{% url 'silent_mammoth_whistle:user_sessions' user.user_id %}">{{ user.user_id }}</a>
 														{% if user.is_new %}
-															<sl-tag variant="success" size="small">New</sl-tag>
+															<span class="tag success">New</span>
 														{% endif %}
 													</td>
 													<td class='number-cell'>{{ user.sessions }}</td>
@@ -70,7 +70,7 @@
 							<div id='tops-section' class='monthly-stats-section'>
 								{% if top_useragents %}
 									<div class='table-container'>
-										<div class="little-title">Top platforms</div>
+										<div class="little-title">{% include "silent_mammoth_whistle/icons/globe.svg" %} Top platforms</div>
 										<table class='small'>
 											<thead>
 												<tr>
@@ -91,7 +91,7 @@
 								{% endif %}
 								{% if top_viewport_dimensions %}
 									<div class='table-container'>
-										<div class="little-title">Top screen sizes</div>
+										<div class="little-title">{% include "silent_mammoth_whistle/icons/arrows-fullscreen.svg" %} Top screen sizes</div>
 										<table class='small'>
 											<thead>
 												<tr>
@@ -121,7 +121,7 @@
 		{% if invitations %}
 			<div id='django-invitations-section' class='table-container container container-padding'>
 				<div class="little-title">
-					<sl-icon name="envelope-paper"></sl-icon>
+					{% include "silent_mammoth_whistle/icons/envelope-paper.svg" %}
 					Active invitations
 				</div>
 				{% if invitations|length == 0 %}
@@ -159,10 +159,10 @@
 					</div>
 					<div hx-boost="true" class="button-group">
 						<a href="{% url 'silent_mammoth_whistle:index_by_date' previous_day %}" class='button'>
-							{% include "silent_mammoth_whistle/_icon_previous.svg" %}
+							{% include "silent_mammoth_whistle/icons/chevron-left.svg" %}
 						</a>
 						<a href="{% url 'silent_mammoth_whistle:index_by_date' next_day %}" class='button'>
-							{% include "silent_mammoth_whistle/_icon_next.svg" %}
+							{% include "silent_mammoth_whistle/icons/chevron-right.svg" %}
 						</a>
 					</div>
 				</div>

@@ -1,7 +1,7 @@
 {% extends 'silent_mammoth_whistle/base.html' %}
 {% load static whistle_helpers %}
 {% block extra_styles %}
-	<link rel="stylesheet" href="{% static 'silent_mammoth_whistle/css/user-sessions.css' %}?v=1">
+	<link rel="stylesheet" href="{% static 'silent_mammoth_whistle/css/user-sessions.css' %}?v=2">
 {% endblock %}
 {% block title %}{{ user_id}}{% endblock %}
 
@@ -10,7 +10,7 @@
 	<div id="whistles-header">
 		{% comment %} {% url 'silent_mammoth_whistle:index_by_date' date %} {% endcomment %}
 		<a href="{{ request.META.HTTP_REFERER }}" onclick="history.back();" class="button">
-			{% include "silent_mammoth_whistle/_icon_previous.svg" %}
+			{% include "silent_mammoth_whistle/icons/chevron-left.svg" %}
 		</a>
 		<div id="user-header">
 			<h1 class='heading large'><sl-icon name="person"></sl-icon> {{ user_id }}</h1>
@@ -36,7 +36,7 @@
 							<td class='main-cell'>{{ row.date|date:"j M y" }}</td>
 							<td class='number-cell nowrap'>
 								{{ row.num_whistles }}
-								{% if autolog_response_code %}
+								{% if show_response_code %}
 									{% for code, count in row.status_counts.items %}
 										{% if count > 0 %}
 											<div class='status-code-count {% if code == "500" %}danger{% else %}warning{% endif %}'>{{ code }} · {{ count }}</div>

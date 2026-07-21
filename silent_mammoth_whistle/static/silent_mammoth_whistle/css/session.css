@@ -36,7 +36,7 @@ h1 {
 	display: flex;
 	justify-content: space-between;
 	align-items: end;
-	margin-bottom: var(--sl-spacing-medium);
+	margin-bottom: var(--wa-space-m);
 }
 #session-time {
 	text-align: right;
@@ -47,7 +47,7 @@ h1 {
 	align-items: center;
 }
 #user-header .secondary {
-	font-size: var(--sl-font-size-small);
+	font-size: var(--wa-font-size-s);
 	color: var(--blue-gray-700);
 	display: flex;
 	align-items: center;
@@ -56,29 +56,29 @@ h1 {
 #session-time .duration {
 	display: flex;
 	align-items: center;
-	gap: var(--sl-spacing-2x-small);
+	gap: var(--wa-space-2xs);
 }
 #session-time .duration {
-	font-size: var(--sl-font-size-small);
+	font-size: var(--wa-font-size-s);
 }
 .chart-subheading {
-	margin-bottom: var(--sl-spacing-large);
-  	font-size: var(--sl-font-size-x-small);
+	margin-bottom: var(--wa-space-l);
+  	font-size: var(--wa-font-size-xs);
 	color: var(--blue-gray-700);
 }
 
 .browser-change {
-	font-size: var(--sl-font-size-x-small);
+	font-size: var(--wa-font-size-xs);
 	width: fit-content;
-	padding: var(--sl-spacing-x-small) var(--sl-spacing-small);
+	padding: var(--wa-space-xs) var(--wa-space-s);
 	display: flex;
-  	gap: var(--sl-spacing-medium);
+  	gap: var(--wa-space-m);
 }
 .browser-change > .data {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	gap: var(--sl-spacing-2x-small);
+	gap: var(--wa-font-size-2xs);
 }
 table .browser-change {
 	color: var(--blue-gray-600);
